@@ -607,13 +607,16 @@ export default function LandingPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isVideoOpen, setIsVideoOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [gifPlaybackVersions, setGifPlaybackVersions] = useState(() => chromeExtensionPanels.map(() => 0))
+  const [displayedGif, setDisplayedGif] = useState({ panelIndex: 0, version: 0 })
+  const [incomingGif, setIncomingGif] = useState<{ panelIndex: number; version: number } | null>(null)
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [displayedText, setDisplayedText] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<string>("interview-prep")
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
   const lastScrollY = useRef(0)
+  const latestGifRequest = useRef(0)
+  const gifPlaybackVersions = useRef(chromeExtensionPanels.map(() => 0))
 
   const handleSwitchToSignUp = () => {
     setIsLoginOpen(false)
@@ -687,6 +690,30 @@ export default function LandingPage() {
       router.replace(redirectedFrom || "/")
     }
   }, [isLoading, redirectedFrom, router, session])
+
+  const getGifSrc = (panelIndex: number, version: number) =>
+    `${chromeExtensionPanels[panelIndex].gifSrc}?v=${version}`
+
+  const preloadAndQueueGif = (panelIndex: number, version: number) => {
+    if (typeof window === "undefined") {
+      setIncomingGif({ panelIndex, version })
+      return
+    }
+
+    const requestId = latestGifRequest.current + 1
+    latestGifRequest.current = requestId
+
+    const preloadImage = new window.Image()
+    preloadImage.src = getGifSrc(panelIndex, version)
+    preloadImage.onload = () => {
+      if (latestGifRequest.current !== requestId) return
+      setIncomingGif({ panelIndex, version })
+    }
+    preloadImage.onerror = () => {
+      if (latestGifRequest.current !== requestId) return
+      setIncomingGif({ panelIndex, version })
+    }
+  }
 
   const handleGoogle = async () => {
     if (typeof window === "undefined") return
@@ -917,11 +944,9 @@ export default function LandingPage() {
                       type="button"
                       onClick={() => {
                         setActiveIndex(index)
-                        setGifPlaybackVersions((previous) =>
-                          previous.map((version, versionIndex) =>
-                            versionIndex === index ? version + 1 : version,
-                          ),
-                        )
+                        const nextVersion = gifPlaybackVersions.current[index] + 1
+                        gifPlaybackVersions.current[index] = nextVersion
+                        preloadAndQueueGif(index, nextVersion)
                       }}
                       className={`group relative flex h-full overflow-hidden rounded-xl border p-5 text-left transition-all duration-300 ${
                         isActive
@@ -965,14 +990,29 @@ export default function LandingPage() {
                     </div>
                     <div className="relative flex-1 bg-black/30">
                       <Image
-                        key={`${activeIndex}-${gifPlaybackVersions[activeIndex]}`}
-                        src={`${chromeExtensionPanels[activeIndex].gifSrc}?v=${gifPlaybackVersions[activeIndex]}`}
-                        alt={chromeExtensionPanels[activeIndex].gifAlt}
+                        key={`displayed-${displayedGif.panelIndex}-${displayedGif.version}`}
+                        src={getGifSrc(displayedGif.panelIndex, displayedGif.version)}
+                        alt={chromeExtensionPanels[displayedGif.panelIndex].gifAlt}
                         fill
                         className="object-contain"
                         sizes=""
                         unoptimized
                       />
+                      {incomingGif ? (
+                        <Image
+                          key={`incoming-${incomingGif.panelIndex}-${incomingGif.version}`}
+                          src={getGifSrc(incomingGif.panelIndex, incomingGif.version)}
+                          alt={chromeExtensionPanels[incomingGif.panelIndex].gifAlt}
+                          fill
+                          className="object-contain"
+                          sizes=""
+                          unoptimized
+                          onLoad={() => {
+                            setDisplayedGif(incomingGif)
+                            setIncomingGif(null)
+                          }}
+                        />
+                      ) : null}
                     </div>
                   </div>
                   {/* Floating badge */}
