@@ -14,7 +14,6 @@ import {
   FileText,
   Settings,
   CalendarClock,
-  MessageCircle,
   Laptop,
   Moon,
   SunMedium,

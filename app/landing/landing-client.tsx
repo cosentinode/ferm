@@ -848,7 +848,7 @@ export default function LandingPage() {
         </section>
 
         {/* Chrome Extension Section - Tabbed cards with preview (darker gray) */}
-        <section className="py-24 bg-zinc-800 relative overflow-hidden">
+        <section id="chrome-extension" className="py-24 bg-zinc-800 relative overflow-hidden">
           {/* Full-height fern on left (Section 1) */}
           <SectionFern side="left" />
           <SectionFern side="right" />
@@ -944,7 +944,7 @@ export default function LandingPage() {
         <SectionFernDecor className="py-2 bg-zinc-700" />
 
         {/* AI Section - Clickable feature cards with bento expansion (dark gray) */}
-        <section className="border-y border-border bg-zinc-900 py-24 relative overflow-hidden">
+        <section id="features" className="border-y border-border bg-zinc-900 py-24 relative overflow-hidden">
           {/* Full-height fern on right (Section 2) */}
           <SectionFern side="right" />
           <SectionFern side="left" />
@@ -1113,7 +1113,7 @@ export default function LandingPage() {
         <SectionFernDecor className="py-2 bg-zinc-700" />
 
         {/* FAQ Section - Two column layout with decorative elements (dark gray) */}
-        <section className="py-24 bg-zinc-900 relative overflow-hidden">
+        <section id="faq" className="py-24 bg-zinc-900 relative overflow-hidden">
           {/* Full-height fern on right (Section 4) */}
           <SectionFern side="left" />
           <SectionFern side="right" />
@@ -1235,9 +1235,9 @@ export default function LandingPage() {
                   <div>
                     <h4 className="font-semibold text-foreground">Product</h4>
                     <ul className="mt-4 space-y-3 text-sm">
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Features</Link></li>
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Pricing</Link></li>
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Chrome Extension</Link></li>
+                      <li><Link href="#features" className="text-muted-foreground transition-colors hover:text-foreground">Features</Link></li>
+                      <li><Link href="#faq" className="text-muted-foreground transition-colors hover:text-foreground">Pricing</Link></li>
+                      <li><Link href="#chrome-extension" className="text-muted-foreground transition-colors hover:text-foreground">Chrome Extension</Link></li>
                      
                     </ul>
                   </div>
@@ -1245,9 +1245,9 @@ export default function LandingPage() {
                   <div>
                     <h4 className="font-semibold text-foreground">Company</h4>
                     <ul className="mt-4 space-y-3 text-sm">
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">About</Link></li>
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Privacy</Link></li>
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Terms</Link></li>
+                      <li><Link href="https://ferm.dev/about" className="text-muted-foreground transition-colors hover:text-foreground">About</Link></li>
+                      <li><Link href="https://ferm.dev/privacy" className="text-muted-foreground transition-colors hover:text-foreground">Privacy</Link></li>
+                      <li><Link href="https://ferm.dev/terms" className="text-muted-foreground transition-colors hover:text-foreground">Terms</Link></li>
                     </ul>
                   </div>
                 </div>
