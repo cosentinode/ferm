@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Terms of Service – Ferm",
+  title: "Terms of Service – ferm",
   description:
-    "Read the terms that govern your use of Ferm.",
+    "Read the terms that govern your use of ferm.",
 }
 
 export const dynamic = "force-static"
@@ -17,7 +17,7 @@ export default function TermsOfServicePage() {
         <header className="mb-12 space-y-4">
           <h1 className="text-4xl font-semibold tracking-tight">Terms of Service</h1>
           <p className="text-base text-zinc-400">
-            These terms outline the rules and expectations for using Ferm.
+            These terms outline the rules and expectations for using ferm.
           </p>
         </header>
 
@@ -25,7 +25,7 @@ export default function TermsOfServicePage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-xl font-semibold text-white">Use of the service</h2>
             <p className="mt-3 text-zinc-300">
-              By using Ferm, you agree to use the platform responsibly and in compliance with applicable laws. You are
+              By using ferm, you agree to use the platform responsibly and in compliance with applicable laws. You are
               responsible for the accuracy of the information you provide in your account.
             </p>
           </div>
@@ -41,15 +41,15 @@ export default function TermsOfServicePage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-xl font-semibold text-white">Availability and updates</h2>
             <p className="mt-3 text-zinc-300">
-              We may modify, improve, or discontinue features over time to improve reliability and user experience.
-              We aim to provide a stable service but cannot guarantee uninterrupted availability.
+              I may modify, improve, or discontinue features over time to improve reliability and user experience.
+              I aim to provide a stable service but cannot guarantee uninterrupted availability.
             </p>
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-xl font-semibold text-white">Limitation of liability</h2>
             <p className="mt-3 text-zinc-300">
-              Ferm is provided on an &quot;as is&quot; basis. To the fullest extent permitted by law, Ferm is not liable for
+              ferm is provided on an &quot;as is&quot; basis. To the fullest extent permitted by law, ferm is not liable for
               indirect, incidental, or consequential damages resulting from your use of the platform.
             </p>
           </div>
