@@ -1165,26 +1165,26 @@ export default function LandingPage() {
             <div className="border-t border-border mb-8" />
             <div className="space-y-6">
               <div className="flex gap-4">
-                <span className="text-amber-600 font-medium">1</span>
+                <span className="text-emerald-300 font-medium">1</span>
                 <div>
                   <p className="text-foreground">
-                    <span className="font-semibold text-amber-600">User-First Philosophy:</span>{" "}
+                    <span className="font-semibold text-emerald-300">User-First Philosophy:</span>{" "}
                     Guaranteed privacy and no paywalls... every detail is curated for a premium, simplistic experience
                   </p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <span className="text-amber-600 font-medium">2</span>
+                <span className="text-emerald-300 font-medium">2</span>
                 <div>
                   <p className="text-foreground">
-                    <span className="font-semibold text-amber-600">Compounding Efforts:</span>{" "}
+                    <span className="font-semibold text-emerald-300">Compounding Efforts:</span>{" "}
                     One follow-up or interview prep per day is all it takes to get closer to being the 1%
                   </p>
                 </div>
               </div>
             </div>
            <div className="mt-12 py-6 border-t border-border">
-  <p className="text-lg italic text-amber-600/90">
+  <p className="text-lg italic text-emerald-300/90">
     &ldquo;Luck isn’t a result of pure coincidence. It’s an underlying element that reaches only those who move on their will.&rdquo;
   </p>
 </div>
@@ -1254,16 +1254,17 @@ export default function LandingPage() {
                 Create an account for free and take control today.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <div className="relative overflow-hidden rounded-md p-[1.5px]">
-                  <div className="absolute inset-[-130%] bg-[conic-gradient(from_0deg,#34d399,#22d3ee,#60a5fa,#34d399)] animate-[spin_3s_linear_infinite]" aria-hidden />
-                  <Button
-                    size="lg"
-                    className="relative z-10 border-transparent px-8 shadow-[0_0_24px_rgba(52,211,153,0.25)]"
-                    onClick={() => setIsLoginOpen(true)}
-                  >
-                    Get Started Free
-                  </Button>
-                </div>
+<div className="relative group overflow-hidden rounded-lg p-[4px]"> 
+  <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#50C878_50%,#000000_100%)]" />
+
+  <Button
+    size="lg"
+    className="relative z-10 w-full h-full rounded-lg bg-white px-8 py-2 text-slate-900 hover:bg-gray-50 transition-colors shadow-sm"
+    onClick={() => setIsLoginOpen(true)}
+  >
+    Get Started Free
+  </Button>
+</div>
                 <Button size="lg" variant="outline" onClick={() => setIsVideoOpen(true)} className="gap-2 bg-transparent">
                   <Play className="h-4 w-4" />
                   Watch Demo
