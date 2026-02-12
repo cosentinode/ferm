@@ -21,8 +21,6 @@ import {
   Mail,
   Star,
   Clock,
-  ChevronRight,
-  Brain,
 } from "lucide-react"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -518,6 +516,7 @@ export default function LandingPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isVideoOpen, setIsVideoOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [gifPlaybackVersions, setGifPlaybackVersions] = useState(() => chromeExtensionPanels.map(() => 0))
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [displayedText, setDisplayedText] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
@@ -811,7 +810,7 @@ export default function LandingPage() {
                 Capture opportunities instantly
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                ferm's browser extension makes job tracking quick and easy! Just sign in, click the magic button, and let it work
+                ferm&apos;s browser extension makes job tracking quick and easy! Just sign in, click the magic button, and let it work
               </p>
             </div>
 
@@ -825,7 +824,14 @@ export default function LandingPage() {
                     <button
                       key={panel.title}
                       type="button"
-                      onClick={() => setActiveIndex(index)}
+                      onClick={() => {
+                        setActiveIndex(index)
+                        setGifPlaybackVersions((previous) =>
+                          previous.map((version, versionIndex) =>
+                            versionIndex === index ? version + 1 : version,
+                          ),
+                        )
+                      }}
                       className={`group relative flex h-full overflow-hidden rounded-xl border p-5 text-left transition-all duration-300 ${
                         isActive
                           ? "border-foreground/30 bg-muted shadow-lg"
@@ -868,7 +874,8 @@ export default function LandingPage() {
                     </div>
                     <div className="relative flex-1 bg-black/30">
                       <Image
-                        src={chromeExtensionPanels[activeIndex].gifSrc}
+                        key={`${activeIndex}-${gifPlaybackVersions[activeIndex]}`}
+                        src={`${chromeExtensionPanels[activeIndex].gifSrc}?v=${gifPlaybackVersions[activeIndex]}`}
                         alt={chromeExtensionPanels[activeIndex].gifAlt}
                         fill
                         className="object-contain"
@@ -1151,7 +1158,7 @@ export default function LandingPage() {
           </div>
           <div className="mx-auto max-w-6xl px-6">
               <div className="flex flex-col gap-12 md:flex-row md:items-stretch md:justify-between">
-                <div className="flex h-full flex-col justify-between gap-20">
+                <div className="flex h-full flex-col justify-between gap-12">
                   <Link href="/" className="flex items-center gap-2 text-lg font-bold">
                     <Image
                       src="/logo.png"
@@ -1182,7 +1189,7 @@ export default function LandingPage() {
                       <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Features</Link></li>
                       <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Pricing</Link></li>
                       <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Chrome Extension</Link></li>
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Changelog</Link></li>
+                     
                     </ul>
                   </div>
 
@@ -1190,7 +1197,6 @@ export default function LandingPage() {
                     <h4 className="font-semibold text-foreground">Company</h4>
                     <ul className="mt-4 space-y-3 text-sm">
                       <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">About</Link></li>
-                      <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Blog</Link></li>
                       <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Privacy</Link></li>
                       <li><Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">Terms</Link></li>
                     </ul>
@@ -1198,7 +1204,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
+              <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
                 <p className="text-sm text-muted-foreground">
                   &copy; {new Date().getFullYear()} ferm. All rights reserved.
                 </p>
