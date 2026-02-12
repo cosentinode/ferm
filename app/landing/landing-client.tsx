@@ -252,13 +252,44 @@ function LeafBorderFrame() {
 }
 
 function ExtensionLinkWithGrowingUnderline() {
+const leaves = [
+    {
+      id: 1,
+      // Perfect (You liked this one)
+      d: "M45 20 Q35 15 38 5 Q48 10 45 20 Z",
+      origin: "45px 20px",
+      delay: 0.2,
+    },
+    {
+      id: 2,
+      // FIXED: Was invisible (y=48). Now points UP and LEFT sharply.
+      d: "M120 33 Q110 33 112 18 Q118 25 120 33 Z",
+      origin: "120px 33px",
+      delay: 0.6,
+    },
+    {
+      id: 3,
+      // FIXED: Was a circle. Now a curved thorn pointing RIGHT.
+      d: "M200 23 Q200 12 210 10 Q208 20 200 23 Z",
+      origin: "200px 23px",
+      delay: 0.95,
+    },
+    {
+      id: 4,
+      // Perfect (You liked this one)
+      d: "M280 29 Q285 20 300 25 Q290 32 280 29 Z",
+      origin: "280px 29px",
+      delay: 1.3,
+    },
+  ];
+
   return (
     <span className="relative inline-block">
       <Link
         href={CHROME_EXTENSION_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative z-10 font-semibold text-foreground transition-colors hover:text-emerald-300"
+        className="relative z-10 font-semibold text-emerald-400 transition-colors hover:text-emerald-300"
       >
         ferm&apos;s browser extension
       </Link>
@@ -270,28 +301,39 @@ function ExtensionLinkWithGrowingUnderline() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.8 }}
       >
+        {/* The Main Vine Stem */}
         <motion.path
           d="M4 26 C40 14, 72 36, 106 24 C146 11, 178 35, 214 24 C250 12, 282 30, 316 20"
           fill="none"
           stroke="rgb(52 211 153)"
           strokeLinecap="round"
-          strokeWidth="4"
-          initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true, amount: 0.8 }}
-          transition={{ duration: 1.9, ease: "easeInOut" }}
-        />
-        <motion.path
-          d="M210 23 C220 16, 234 16, 242 24 C232 25, 222 30, 210 23"
-          fill="none"
-          stroke="rgb(74 222 128)"
-          strokeLinecap="round"
           strokeWidth="3"
           initial={{ pathLength: 0 }}
           whileInView={{ pathLength: 1 }}
           viewport={{ once: true, amount: 0.8 }}
-          transition={{ duration: 1.2, ease: "easeOut", delay: 1.2 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
         />
+
+        {/* The Sharp Leaves */}
+        {leaves.map((leaf) => (
+          <motion.path
+            key={leaf.id}
+            d={leaf.d}
+            fill="rgb(74 222 128)" 
+            stroke="rgb(74 222 128)"
+            strokeWidth="1" // Reduced stroke width slightly to enhance sharpness
+            initial={{ scale: 0, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true, amount: 0.8 }}
+            style={{ transformOrigin: leaf.origin }}
+            transition={{
+              duration: 0.3, // Slightly faster pop for sharper feel
+              delay: leaf.delay,
+              type: "spring",
+              bounce: 0.6,
+            }}
+          />
+        ))}
       </motion.svg>
     </span>
   )
