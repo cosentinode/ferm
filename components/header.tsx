@@ -18,6 +18,7 @@ import {
   Laptop,
   Moon,
   SunMedium,
+  Menu,
 } from "lucide-react"
 import { IconButton } from "@/components/ui/icon-button"
 import { Button } from "@/components/ui/button"
@@ -29,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { useSupabase } from "@/components/supabase-provider"
 import { SettingsDialog } from "@/components/settings-dialog"
@@ -59,6 +61,7 @@ export function Header() {
   const { settings, updateSetting } = useSettings()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isContactOpen, setIsContactOpen] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const userAvatar = useMemo(() => {
     const metadata = user?.user_metadata as { picture?: string; avatar_url?: string } | undefined
     return metadata?.picture ?? metadata?.avatar_url ?? null
@@ -125,6 +128,44 @@ export function Header() {
               })}
             </nav>
             <div className="flex items-center justify-end gap-2 sm:gap-3">
+              <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
+                <SheetTrigger asChild>
+                  <IconButton
+                    size="icon"
+                    variant="ghost"
+                    className="md:hidden"
+                    aria-label="Open navigation menu"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </IconButton>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[16rem] p-0">
+                  <SheetHeader className="border-b p-4">
+                    <SheetTitle>Navigation</SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col gap-1 p-2" aria-label="Mobile navigation">
+                    {NAV_ITEMS.map((item) => {
+                      const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+                      return (
+                        <SheetClose asChild key={item.href}>
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              "rounded-md px-3 py-2 text-sm transition-colors",
+                              isActive
+                                ? "bg-muted text-foreground font-medium"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                            )}
+                            aria-current={isActive ? "page" : undefined}
+                          >
+                            {item.label}
+                          </Link>
+                        </SheetClose>
+                      )
+                    })}
+                  </nav>
+                </SheetContent>
+              </Sheet>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <IconButton
