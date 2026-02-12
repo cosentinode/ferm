@@ -1254,10 +1254,16 @@ export default function LandingPage() {
                 Create an account for free and take control today.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <Button size="lg" className="gap-2 px-8" onClick={() => setIsLoginOpen(true)}>
-                  Get Started Free
-                  <ArrowUpRight className="h-4 w-4" aria-hidden />
-                </Button>
+                <div className="relative overflow-hidden rounded-md p-[1.5px]">
+                  <div className="absolute inset-[-130%] bg-[conic-gradient(from_0deg,#34d399,#22d3ee,#60a5fa,#34d399)] animate-[spin_3s_linear_infinite]" aria-hidden />
+                  <Button
+                    size="lg"
+                    className="relative z-10 border-transparent px-8 shadow-[0_0_24px_rgba(52,211,153,0.25)]"
+                    onClick={() => setIsLoginOpen(true)}
+                  >
+                    Get Started Free
+                  </Button>
+                </div>
                 <Button size="lg" variant="outline" onClick={() => setIsVideoOpen(true)} className="gap-2 bg-transparent">
                   <Play className="h-4 w-4" />
                   Watch Demo

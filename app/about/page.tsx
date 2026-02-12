@@ -33,14 +33,14 @@ export default function AboutPage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-xl font-semibold text-white">Who it&apos;s for</h2>
             <p className="mt-3 text-zinc-300">
-              ferm is designed for modern job seekers want a premium job tracking experience without any noise that they don't need. This platform is not made to shove AI slop features down your throat, I wanted to make sure that if I used a non-deterministic tool and resource, that it will perform consistently well and provide usage beyond capable of any other determnistic solution. 
+              ferm is designed for modern job seekers want a premium job tracking experience without any noise that they don&apos;t need. This platform is not made to shove AI slop features down your throat, I wanted to make sure that if I used a non-deterministic tool and resource, that it will perform consistently well and provide usage beyond capable of any other determnistic solution. 
             </p>
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-xl font-semibold text-white">Values</h2>
             <p className="mt-3 text-zinc-300">
-              If you know me at all, (or don't), you could probably guess my favorite motto just by looking at my personal LinkedIn / dev practices or even reading the text contents on the landing page / here.  Every feature is designed
+              If you know me at all, (or don&apos;t), you could probably guess my favorite motto just by looking at my personal LinkedIn / dev practices or even reading the text contents on the landing page / here.  Every feature is designed
               to help you stay in control of your search, with privacy and simplicity being the 2 most important values for anything dev related.
             </p>
           </div>
