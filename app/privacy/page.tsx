@@ -51,8 +51,7 @@ export default function PrivacyPolicyPage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-xl font-semibold text-white">Data retention and deletion</h2>
             <p className="mt-3 text-zinc-300">
-              You can request deletion of your account and associated data at any time. Once we verify your request, we
-              will remove your information from our systems within a reasonable timeframe.
+              You can delete your account and associated data at any time.
             </p>
           </div>
 
@@ -61,8 +60,8 @@ export default function PrivacyPolicyPage() {
             <p className="mt-3 text-zinc-300">
               If you have questions about this policy or how ferm handles your data, please contact us at
               {" "}
-              <a href="mailto:acozy03@gmail.com" className="text-zinc-100 underline decoration-zinc-500 hover:text-white">
-                acozy03@gmail.com
+              <a href="mailto:adrian@ferm.dev" className="text-zinc-100 underline decoration-zinc-500 hover:text-white">
+                adrian@ferm.dev
               </a>
               .
             </p>

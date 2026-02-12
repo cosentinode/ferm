@@ -34,6 +34,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+const CHROME_EXTENSION_URL =
+  "https://chromewebstore.google.com/detail/fermdev-job-loader/akgppdhffcfpeipmapfbgjcmdlkhkfpp"
+
 const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters long")
@@ -245,6 +248,52 @@ function LeafBorderFrame() {
         }
       `}</style>
     </div>
+  )
+}
+
+function ExtensionLinkWithGrowingUnderline() {
+  return (
+    <span className="relative inline-block">
+      <Link
+        href={CHROME_EXTENSION_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative z-10 font-semibold text-foreground transition-colors hover:text-emerald-300"
+      >
+        ferm&apos;s browser extension
+      </Link>
+      <motion.svg
+        className="pointer-events-none absolute -bottom-2 left-0 h-4 w-full"
+        viewBox="0 0 320 40"
+        preserveAspectRatio="none"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.8 }}
+      >
+        <motion.path
+          d="M4 26 C40 14, 72 36, 106 24 C146 11, 178 35, 214 24 C250 12, 282 30, 316 20"
+          fill="none"
+          stroke="rgb(52 211 153)"
+          strokeLinecap="round"
+          strokeWidth="4"
+          initial={{ pathLength: 0 }}
+          whileInView={{ pathLength: 1 }}
+          viewport={{ once: true, amount: 0.8 }}
+          transition={{ duration: 1.9, ease: "easeInOut" }}
+        />
+        <motion.path
+          d="M210 23 C220 16, 234 16, 242 24 C232 25, 222 30, 210 23"
+          fill="none"
+          stroke="rgb(74 222 128)"
+          strokeLinecap="round"
+          strokeWidth="3"
+          initial={{ pathLength: 0 }}
+          whileInView={{ pathLength: 1 }}
+          viewport={{ once: true, amount: 0.8 }}
+          transition={{ duration: 1.2, ease: "easeOut", delay: 1.2 }}
+        />
+      </motion.svg>
+    </span>
   )
 }
 // Full-width decorative fern divider that spans the entire horizontal bar
@@ -691,7 +740,7 @@ export default function LandingPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-2 text-sm font-medium text-foreground"
               >
                 <Sparkles className="h-4 w-4" />
-                Now with AI-powered Interview Prep
+                AI-powered Interview Prep Coming Soon!
               </motion.div>
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
@@ -810,7 +859,7 @@ export default function LandingPage() {
                 Capture opportunities instantly
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                ferm&apos;s browser extension makes job tracking quick and easy! Just sign in, click the magic button, and let it work
+                <ExtensionLinkWithGrowingUnderline /> makes job tracking quick and easy! Just sign in, click the magic button, and let it work
               </p>
             </div>
 

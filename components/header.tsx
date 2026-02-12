@@ -42,7 +42,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Follow-ups", href: "/follow-ups", icon: Mail },
   { label: "Interviews", href: "/interviews", icon: CalendarClock },
-  { label: "Prep", href: "/prep", icon: MessageCircle },
+  // { label: "Prep", href: "/prep", icon: MessageCircle },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Resume", href: "/resume", icon: FileText },
 ] as const

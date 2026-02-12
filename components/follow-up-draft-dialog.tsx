@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { differenceInCalendarDays } from "date-fns"
 import { Loader2, Wand2, Copy, Check } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,11 @@ interface FollowUpDraftDialogProps {
   disabled?: boolean
   hasGeneratedDraft?: boolean
   onDraftUpdated?: (update: { draft: string; generatedAt?: string | null }) => void
+  triggerClassName?: string
+  triggerLabel?: string
+  showTriggerLabel?: boolean
+  triggerVariant?: ButtonProps["variant"]
+  triggerSize?: ButtonProps["size"]
 }
 
 export function FollowUpDraftDialog({
@@ -27,6 +32,11 @@ export function FollowUpDraftDialog({
   disabled,
   hasGeneratedDraft,
   onDraftUpdated,
+  triggerClassName,
+  triggerLabel = "AI draft",
+  showTriggerLabel = true,
+  triggerVariant = "secondary",
+  triggerSize = "sm",
 }: FollowUpDraftDialogProps) {
   const storedDraft = application.ai_follow_up_draft_text?.trim() ?? ""
   const [open, setOpen] = useState(false)
@@ -206,9 +216,14 @@ export function FollowUpDraftDialog({
       }
     }}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm" disabled={disabled} className="gap-2 w-[12.5rem]">
+        <Button
+          variant={triggerVariant}
+          size={triggerSize}
+          disabled={disabled}
+          className={`gap-2 ${triggerClassName ?? "w-[12.5rem]"}`}
+        >
           <Wand2 className="h-4 w-4" />
-          AI draft
+          {showTriggerLabel ? triggerLabel : <span className="sr-only">{triggerLabel}</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl" showCloseButton={false}>
