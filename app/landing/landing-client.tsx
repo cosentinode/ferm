@@ -1287,9 +1287,9 @@ export default function LandingPage() {
                   <div>
                     <h4 className="font-semibold text-foreground">Company</h4>
                     <ul className="mt-4 space-y-3 text-sm">
-                      <li><Link href="https://ferm.dev/about" className="text-muted-foreground transition-colors hover:text-foreground">About</Link></li>
-                      <li><Link href="https://ferm.dev/privacy" className="text-muted-foreground transition-colors hover:text-foreground">Privacy</Link></li>
-                      <li><Link href="https://ferm.dev/terms" className="text-muted-foreground transition-colors hover:text-foreground">Terms</Link></li>
+                      <li><Link href="https://ferm.dev/about" target="_blank" className="text-muted-foreground transition-colors hover:text-foreground">About</Link></li>
+                      <li><Link href="https://ferm.dev/privacy" target="_blank" className="text-muted-foreground transition-colors hover:text-foreground">Privacy</Link></li>
+                      <li><Link href="https://ferm.dev/terms" target="_blank" className="text-muted-foreground transition-colors hover:text-foreground">Terms</Link></li>
                     </ul>
                   </div>
                 </div>

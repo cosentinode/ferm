@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
-const PUBLIC_ROUTES = ["/landing", "/auth/callback", "/privacy"]
+const PUBLIC_ROUTES = ["/landing", "/auth/callback", "/privacy", "/about", "/terms"]
 const CSRF_COOKIE_NAME = "csrf-token"
 const CSRF_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 12
 
