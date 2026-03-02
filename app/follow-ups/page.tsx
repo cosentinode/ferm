@@ -451,7 +451,6 @@ export default function FollowUpsPage() {
                       </div>
 
                       <div className="relative hidden md:block">
-                        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent" />
                         <div className="overflow-x-auto rounded-md border px-3 pb-2 md:px-4 lg:px-6">
                           <Table className="table-auto min-w-[760px]">
                             <TableHeader>

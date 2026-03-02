@@ -518,25 +518,24 @@ const interactiveWords = ["application", "interview", "follow-up", "opportunity"
 
 const superchargeFeatures = [
   {
-    id: "interview-prep",
-    title: "AI Interview Prep",
-    description: "Practice with personalized questions",
-    icon: MessageSquare,
+    id: "follow-ups",
+    title: "Follow-up Emails",
+    icon: Mail,
     bentoContent: {
-      headline: "Practice with AI-generated questions",
-      subtext: "Get personalized interview questions based on the job description and company. Practice your answers and get instant feedback.",
+      headline: "Generate polished follow-up drafts in seconds",
+      subtext: "Stay consistent after every interview with context-aware follow-up emails that sound natural and personalized.",
       features: [
-        { label: "Sample question", value: '"Tell me about a time you handled a difficult stakeholder..."' },
-        { label: "AI feedback", value: "Great use of STAR method!" },
-        { label: "Questions generated", value: "500+" },
-        { label: "Success rate", value: "94%" },
-      ]
-    }
+        { label: "Suggested send time", value: "Next morning" },
+        { label: "Tone", value: "Professional + warm" },
+        { label: "Custom drafts", value: "Unlimited" },
+        { label: "Reply rate lift", value: "+22%" },
+      ],
+      screenshotLabel: "Follow-up email preview",
+    },
   },
   {
     id: "job-scoring",
     title: "Job Scoring",
-    description: "AI-powered match analysis",
     icon: Star,
     bentoContent: {
       headline: "Know your match before you apply",
@@ -546,40 +545,25 @@ const superchargeFeatures = [
         { label: "Skills matched", value: "12/14" },
         { label: "Experience fit", value: "Strong" },
         { label: "Culture alignment", value: "High" },
-      ]
-    }
+      ],
+      screenshotLabel: "Job scoring dashboard snapshot",
+    },
   },
   {
-    id: "follow-ups",
-    title: "Follow-up Emails",
-    description: "Context-aware drafts in seconds",
-    icon: Mail,
+    id: "interview-prep",
+    title: "Interview Prep (coming soon)",
+    icon: MessageSquare,
     bentoContent: {
-      headline: "Draft follow-ups in seconds",
-      subtext: "Context-aware follow-ups that sound like you. Never miss the right moment to reconnect.",
+      headline: "AI Interview Prep is coming soon",
+      subtext: "We are building guided interview practice with tailored questions and instant feedback based on your target role.",
       features: [
-        { label: "Tone", value: "Professional & warm" },
-        { label: "Context", value: "Auto-pulled from history" },
-        { label: "Timing", value: "AI-suggested" },
-        { label: "Templates", value: "25+" },
-      ]
-    }
-  },
-  {
-    id: "insights",
-    title: "Analytics",
-    description: "Track your job search progress",
-    icon: TrendingUp,
-    bentoContent: {
-      headline: "Data-driven job search insights",
-      subtext: "Understand what's working and optimize your approach with detailed analytics.",
-      features: [
-        { label: "Response rate", value: "23%" },
-        { label: "Avg. time to interview", value: "8 days" },
-        { label: "Top performing roles", value: "SWE, PM" },
-        { label: "Best application days", value: "Tue, Wed" },
-      ]
-    }
+        { label: "Role-specific prompts", value: "Planned" },
+        { label: "Answer scoring", value: "Planned" },
+        { label: "Voice mode", value: "Planned" },
+        { label: "Launch", value: "Coming soon" },
+      ],
+      screenshotLabel: "Interview prep preview (coming soon)",
+    },
   },
 ]
 
@@ -612,7 +596,7 @@ export default function LandingPage() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [displayedText, setDisplayedText] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
-  const [selectedFeature, setSelectedFeature] = useState<string>("interview-prep")
+  const [selectedFeature, setSelectedFeature] = useState<string>("follow-ups")
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
   const lastScrollY = useRef(0)
   const latestGifRequest = useRef(0)
@@ -1041,37 +1025,29 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature Cards Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {superchargeFeatures.map((feature) => {
-                  const Icon = feature.icon
-                  const isSelected = selectedFeature === feature.id
-                  
-                  return (
-                    <button
-                      key={feature.id}
-                      type="button"
-                      onClick={() => setSelectedFeature(feature.id)}
-                      className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-300 ${
-                        isSelected
-                          ? "border-foreground/40 bg-muted shadow-xl ring-1 ring-foreground/20"
-                          : "border-border bg-card hover:border-foreground/20 hover:shadow-lg"
-                      }`}
-                    >
-                      <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl transition-colors ${
-                        isSelected ? "bg-foreground text-background" : "bg-muted text-foreground group-hover:bg-foreground/10"
-                      }`}>
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{feature.description}</p>
-                      <div className={`absolute right-4 top-4 transition-transform ${isSelected ? "rotate-45" : ""}`}>
-                        <div className={`h-2 w-2 rounded-full ${isSelected ? "bg-foreground" : "bg-muted-foreground/50"}`} />
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+            {/* Feature selector (individual bordered containers) */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {superchargeFeatures.map((feature) => {
+                const Icon = feature.icon
+                const isSelected = selectedFeature === feature.id
+
+                return (
+                  <button
+                    key={feature.id}
+                    type="button"
+                    onClick={() => setSelectedFeature(feature.id)}
+                    className={`group flex items-center gap-3 rounded-xl border px-5 py-4 text-left transition-all duration-200 ${
+                      isSelected
+                        ? "border-foreground/40 bg-muted/50 text-foreground shadow-md"
+                        : "border-border bg-card/40 text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <h3 className="font-semibold">{feature.title}</h3>
+                  </button>
+                )
+              })}
+            </div>
 
               {/* Expanded Bento Content - Always visible, smooth transition between features */}
               <div className="mt-6">
@@ -1086,57 +1062,20 @@ export default function LandingPage() {
                     {(() => {
                       const feature = superchargeFeatures.find(f => f.id === selectedFeature)
                       if (!feature) return null
-                      const Icon = feature.icon
-                      
                       return (
                         <div className="rounded-3xl border border-border bg-card p-8">
-                          <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
-                            {/* Left side - Main content */}
-                            <div>
-                              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground">
-                                <Icon className="h-4 w-4" />
-                                {feature.title}
-                              </div>
-                              <h3 className="text-2xl font-bold text-foreground">
-                                {feature.bentoContent.headline}
-                              </h3>
-                              <p className="mt-3 text-muted-foreground">
-                                {feature.bentoContent.subtext}
-                              </p>
-                              <Button className="mt-6 gap-2">
-                                Try it now
-                                <ArrowUpRight className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            
-                            {/* Right side - Feature grid */}
-                            <div className="grid grid-cols-2 gap-3">
-                              {feature.bentoContent.features.map((item, idx) => (
-                                <motion.div
-                                  key={item.label}
-                                  initial={{ opacity: 0, scale: 0.9 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ delay: idx * 0.05 }}
-                                  className="rounded-xl border border-border/50 bg-background/50 p-4"
-                                >
-                                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                                  <p className="mt-1 font-medium text-foreground text-sm">{item.value}</p>
-                                </motion.div>
-                              ))}
-                            </div>
+                          <div>
+                            <h3 className="text-2xl font-bold text-foreground">
+                              {feature.bentoContent.headline}
+                            </h3>
+                            <p className="mt-3 text-muted-foreground">
+                              {feature.bentoContent.subtext}
+                            </p>
                           </div>
-                          
-                          {/* GIF/Demo area - Full width */}
-                          <div className="mt-8 rounded-2xl border border-border/50 bg-muted/30 overflow-hidden">
-                            <div className="aspect-[21/9] flex items-center justify-center">
-                              <div className="text-center text-muted-foreground">
-                                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
-                                  <Icon className="h-6 w-6" />
-                                </div>
-                                <p className="text-sm">Feature demo GIF</p>
-                                <p className="text-xs mt-1">Replace with your GIF</p>
-                              </div>
-                            </div>
+
+                          {/* Screenshot area - image container only */}
+                          <div className="mt-8 overflow-hidden rounded-2xl border border-border/50 bg-muted/20 p-4">
+                            <div className="aspect-[21/9] rounded-xl border border-border/50 bg-zinc-900/60" />
                           </div>
                         </div>
                       )
