@@ -994,7 +994,7 @@ export default function LandingPage() {
                         src={getGifSrc(displayedGif.panelIndex, displayedGif.version)}
                         alt={chromeExtensionPanels[displayedGif.panelIndex].gifAlt}
                         fill
-                        className="object-contain"
+                        className="object-cover"
                         sizes=""
                         unoptimized
                       />
@@ -1004,7 +1004,7 @@ export default function LandingPage() {
                           src={getGifSrc(incomingGif.panelIndex, incomingGif.version)}
                           alt={chromeExtensionPanels[incomingGif.panelIndex].gifAlt}
                           fill
-                          className="object-contain"
+                          className="object-cover"
                           sizes=""
                           unoptimized
                           onLoad={() => {

@@ -340,6 +340,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const corsHeaders = getCorsHeaders(request.headers.get("origin"))
+
   try {
     const csrfError = requireCookieCsrf(request)
     if (csrfError) {
@@ -493,7 +495,6 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error("Failed to create job application", error)
-    const corsHeaders = getCorsHeaders(request.headers.get("origin"))
     return NextResponse.json({ error: "Internal server error" }, { status: 500, headers: corsHeaders })
   }
 }
