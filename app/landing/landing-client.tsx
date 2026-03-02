@@ -289,7 +289,7 @@ const leaves = [
         href={CHROME_EXTENSION_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative z-10 font-semibold text-emerald-400 transition-colors hover:text-emerald-400"
+        className="relative z-10 font-semibold text-emerald-400 transition-colors hover:text-emerald-300"
       >
         ferm&apos;s browser extension
       </Link>
@@ -1165,26 +1165,26 @@ export default function LandingPage() {
             <div className="border-t border-border mb-8" />
             <div className="space-y-6">
               <div className="flex gap-4">
-                <span className="text-emerald-400 font-medium">1</span>
+                <span className="text-zinc-400 font-medium">1</span>
                 <div>
                   <p className="text-foreground">
-                    <span className="font-semibold text-emerald-400">User-First Philosophy:</span>{" "}
+                    <span className="font-semibold text-zinc-400">User-First Philosophy:</span>{" "}
                     Guaranteed privacy and no paywalls... every detail is curated for a premium, simplistic experience
                   </p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <span className="text-emerald-400 font-medium">2</span>
+                <span className="text-zinc-400 font-medium">2</span>
                 <div>
                   <p className="text-foreground">
-                    <span className="font-semibold text-emerald-400">Compounding Efforts:</span>{" "}
+                    <span className="font-semibold text-zinc-400">Compounding Efforts:</span>{" "}
                     One follow-up or interview prep per day is all it takes to get closer to being the 1%
                   </p>
                 </div>
               </div>
             </div>
            <div className="mt-12 py-6 border-t border-border">
-  <p className="text-lg italic text-emerald-400/90">
+  <p className="text-lg italic text-zinc-400">
     &ldquo;Luck isn’t a result of pure coincidence. It’s an underlying element that reaches only those who move on their will.&rdquo;
   </p>
 </div>
