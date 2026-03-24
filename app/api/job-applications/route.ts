@@ -10,6 +10,7 @@ import { expandStatusFilters, normalizeStatusValue, parseStatus } from "@/lib/st
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
 import { enforceRateLimit } from "@/lib/api/rate-limit"
 import { resolveOpenAIApiKey, USER_OPENAI_KEY_HEADER } from "@/lib/ai/keys"
+import { getResumeScoringSystemPrompt } from "@/lib/ai/prompts"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -116,9 +117,7 @@ async function generateResumeMatchScore({ job, resumeText, apiKey }: ResumeScori
     controller.abort()
   }, RESUME_SCORING_TIMEOUT_MS)
 
-  const systemPrompt =
-    "You are an expert career coach. Compare the candidate's resume against the job listing and respond with strict JSON. " +
-    "Return keys `score` (0-100 whole integers) and `summary` (<=75 words). You should be very harsh, honest and critical.";
+  const systemPrompt = getResumeScoringSystemPrompt()
 
   const userPrompt = `Job application details:\n${JSON.stringify(job, null, 2)}\n\nCandidate resume:\n"""\n${resumeText}\n"""`
 

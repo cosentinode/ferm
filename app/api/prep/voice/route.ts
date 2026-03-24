@@ -3,6 +3,12 @@ import Groq from "groq-sdk"
 
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
 import { enforceRateLimit } from "@/lib/api/rate-limit"
+import {
+  getPrepVoiceFallbackReplyPrompt,
+  getPrepVoiceJobLinePrompt,
+  getPrepVoiceNoteLinePrompt,
+  getPrepVoiceSessionRulesPrompt,
+} from "@/lib/ai/prompts"
 import { buildPrepContext } from "../context"
 
 type ChatHistory = { role: string; content: string }[]
@@ -110,8 +116,8 @@ export async function POST(request: NextRequest) {
     ? (() => {
         try {
           const parsed = JSON.parse(jobContext) as { role?: string | null; company?: string | null; latestNote?: string | null }
-          const jobLine = `You are prepping the user for ${parsed.role ?? "their role"} at ${parsed.company ?? "their company"}.`
-          const noteLine = parsed.latestNote ? ` Keep this note in mind: ${parsed.latestNote}` : ""
+          const jobLine = getPrepVoiceJobLinePrompt(parsed.role ?? "their role", parsed.company ?? "their company")
+          const noteLine = parsed.latestNote ? getPrepVoiceNoteLinePrompt(parsed.latestNote) : ""
           return `${jobLine}${noteLine}`
         } catch {
           return ""
@@ -158,9 +164,7 @@ export async function POST(request: NextRequest) {
     const messages = [
       {
         role: "system" as const,
-        content:
-          context +
-          "\n\nVoice session rules: Keep a coaching tone, stay under 120 words, and do not repeat the transcript back. Move the conversation forward with a new question or feedback.",
+        content: `${context}\n\n${getPrepVoiceSessionRulesPrompt()}`,
       },
       ...messageHistory.map((message) => ({ role: message.role as "user" | "assistant", content: message.content })),
       { role: "user" as const, content: transcript },
@@ -172,7 +176,7 @@ export async function POST(request: NextRequest) {
       temperature: 0.6,
     })
 
-    const replyText = completion.choices[0]?.message?.content?.trim() ?? "I heard you. Let's keep practicing."
+    const replyText = completion.choices[0]?.message?.content?.trim() ?? getPrepVoiceFallbackReplyPrompt()
 
     const audioBase64 = voiceReplies ? await synthesizeCartesiaSpeech(replyText) : null
 

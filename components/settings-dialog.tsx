@@ -336,7 +336,7 @@ return (
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Go, it's free!
+                        Go, it&apos;s free!
                       </a>
                     </Button>
                   </div>

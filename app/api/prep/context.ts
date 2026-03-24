@@ -1,5 +1,6 @@
 import { getLatestResumeText } from "@/lib/resume/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { getPrepBaseContextPrompt } from "@/lib/ai/prompts"
 
 const MAX_SECTION_LENGTH = 1800
 const MAX_INTERVIEW_HISTORY = 5
@@ -75,7 +76,7 @@ export async function buildPrepContext({
     : []
 
   const contextSections: string[] = [
-    "You are Prep, a concise mock interview coach. Keep responses under 120 words and end with a targeted follow-up question.",
+    getPrepBaseContextPrompt(),
   ]
 
   if (resume?.text) {

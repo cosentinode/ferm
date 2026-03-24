@@ -602,7 +602,25 @@ export default function LandingPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<string>("follow-ups")
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
+  const [displayedExtensionGif, setDisplayedExtensionGif] = useState({ panelIndex: 0, version: 0 })
+  const [incomingExtensionGif, setIncomingExtensionGif] = useState<{ panelIndex: number; version: number } | null>(null)
+  const [displayedFeatureGif, setDisplayedFeatureGif] = useState({ featureId: "follow-ups", version: 0 })
+  const [incomingFeatureGif, setIncomingFeatureGif] = useState<{ featureId: string; version: number } | null>(null)
   const lastScrollY = useRef(0)
+  const gifVersionRef = useRef(0)
+
+  const getNextGifVersion = () => {
+    gifVersionRef.current += 1
+    return gifVersionRef.current
+  }
+
+  const getExtensionGifSrc = (panelIndex: number, version: number) =>
+    `${chromeExtensionPanels[panelIndex].gifSrc}?v=${version}`
+
+  const getFeatureGifSrc = (featureId: string, version: number) => {
+    const feature = superchargeFeatures.find((item) => item.id === featureId)
+    return feature ? `${feature.bentoContent.mediaSrc}?v=${version}` : ""
+  }
 
   const handleSwitchToSignUp = () => {
     setIsLoginOpen(false)
@@ -676,6 +694,24 @@ export default function LandingPage() {
       router.replace(redirectedFrom || "/")
     }
   }, [isLoading, redirectedFrom, router, session])
+
+  useEffect(() => {
+    if (activeIndex === displayedExtensionGif.panelIndex) return
+
+    setIncomingExtensionGif({
+      panelIndex: activeIndex,
+      version: getNextGifVersion(),
+    })
+  }, [activeIndex, displayedExtensionGif.panelIndex])
+
+  useEffect(() => {
+    if (selectedFeature === displayedFeatureGif.featureId) return
+
+    setIncomingFeatureGif({
+      featureId: selectedFeature,
+      version: getNextGifVersion(),
+    })
+  }, [selectedFeature, displayedFeatureGif.featureId])
 
   const handleGoogle = async () => {
     if (typeof window === "undefined") return
@@ -947,14 +983,29 @@ export default function LandingPage() {
                     </div>
                     <div className="relative flex-1 bg-black/30">
                       <Image
-                        key={chromeExtensionPanels[activeIndex].gifSrc}
-                        src={chromeExtensionPanels[activeIndex].gifSrc}
-                        alt={chromeExtensionPanels[activeIndex].gifAlt}
+                        key={`extension-${displayedExtensionGif.panelIndex}-${displayedExtensionGif.version}`}
+                        src={getExtensionGifSrc(displayedExtensionGif.panelIndex, displayedExtensionGif.version)}
+                        alt={chromeExtensionPanels[displayedExtensionGif.panelIndex].gifAlt}
                         fill
                         className="object-cover"
                         sizes=""
                         unoptimized
                       />
+                      {incomingExtensionGif ? (
+                        <Image
+                          key={`incoming-extension-${incomingExtensionGif.panelIndex}-${incomingExtensionGif.version}`}
+                          src={getExtensionGifSrc(incomingExtensionGif.panelIndex, incomingExtensionGif.version)}
+                          alt={chromeExtensionPanels[incomingExtensionGif.panelIndex].gifAlt}
+                          fill
+                          className="object-cover"
+                          sizes=""
+                          unoptimized
+                          onLoad={() => {
+                            setDisplayedExtensionGif(incomingExtensionGif)
+                            setIncomingExtensionGif(null)
+                          }}
+                        />
+                      ) : null}
                     </div>
                   </div>
                   {/* Floating badge */}
@@ -1035,12 +1086,33 @@ export default function LandingPage() {
                           <div className="mt-8 overflow-hidden rounded-2xl border border-border/50 bg-muted/20 p-4">
                             <div className="relative aspect-[21/9] overflow-hidden rounded-xl border border-border/50 bg-zinc-900/60">
                               <Image
-                                src={feature.bentoContent.mediaSrc}
-                                alt={feature.bentoContent.screenshotLabel}
+                                key={`feature-${displayedFeatureGif.featureId}-${displayedFeatureGif.version}`}
+                                src={getFeatureGifSrc(displayedFeatureGif.featureId, displayedFeatureGif.version)}
+                                alt={
+                                  superchargeFeatures.find((item) => item.id === displayedFeatureGif.featureId)?.bentoContent
+                                    .screenshotLabel ?? feature.bentoContent.screenshotLabel
+                                }
                                 fill
                                 className="object-cover"
                                 unoptimized
                               />
+                              {incomingFeatureGif ? (
+                                <Image
+                                  key={`incoming-feature-${incomingFeatureGif.featureId}-${incomingFeatureGif.version}`}
+                                  src={getFeatureGifSrc(incomingFeatureGif.featureId, incomingFeatureGif.version)}
+                                  alt={
+                                    superchargeFeatures.find((item) => item.id === incomingFeatureGif.featureId)?.bentoContent
+                                      .screenshotLabel ?? feature.bentoContent.screenshotLabel
+                                  }
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                  onLoad={() => {
+                                    setDisplayedFeatureGif(incomingFeatureGif)
+                                    setIncomingFeatureGif(null)
+                                  }}
+                                />
+                              ) : null}
                               <div className="absolute right-3 top-3 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs font-medium text-white">
                                 {feature.bentoContent.mediaType} — replace when ready
                               </div>

@@ -5,6 +5,7 @@ import { z } from "zod"
 import { resolveOpenAIApiKey, USER_OPENAI_KEY_HEADER } from "@/lib/ai/keys"
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
 import { enforceRateLimit } from "@/lib/api/rate-limit"
+import { getPrepChatTitleInstructionsPrompt } from "@/lib/ai/prompts"
 
 const BodySchema = z.object({
   chatId: z.string().uuid(),
@@ -98,9 +99,7 @@ export async function POST(request: NextRequest) {
   )
 
   const instructions = [
-    "You are naming an interview prep chat.",
-    "Respond with a concise, efficient title (4-8 words). Should go something like : SWE I Interview - Ursa Major",
-    "Avoid quotation marks and sentence punctuation; keep it title case.",
+    getPrepChatTitleInstructionsPrompt(),
     jobDetails && `Context: ${jobDetails}`,
     condensedMessages.length > 0 && `Recent dialogue:\n${condensedMessages.join("\n")}`,
   ]

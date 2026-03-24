@@ -5,6 +5,7 @@ import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
 import { enforceRateLimit } from "@/lib/api/rate-limit"
 import { resolveOpenAIApiKey, USER_OPENAI_KEY_HEADER } from "@/lib/ai/keys"
 import { getLatestResumeText } from "@/lib/resume/server"
+import { applyTemplate, getFollowUpSystemPrompt, getFollowUpUserPromptTemplate } from "@/lib/ai/prompts"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -134,7 +135,17 @@ export async function POST(request: NextRequest) {
   const jobDescriptionExcerpt = jobDescription ? jobDescription.slice(0, 1200) : null
   const resumeContext = resumeText || "Not provided"
 
-  const userPrompt = `You are drafting a concise, professional follow-up email.\n\nContext:\n- Candidate email: ${userEmail}\n- Company: ${companyName}\n- Role: ${positionTitle}\n- Contact: ${contactName ?? "Hiring manager"}\n- Days since application: ${daysSinceApplication}\n- Application date: ${appliedAt ?? "Unknown"}\n- Notes: ${notesText}\n- Job description excerpt: ${jobDescriptionExcerpt ?? "Not provided"}\n- Resume text:\n${resumeContext}\n\nWrite a friendly, confident follow-up email encouraging a response and including specifics about the user that can be a strength to this role from the resume content. Return only the email body.`
+  const userPrompt = applyTemplate(getFollowUpUserPromptTemplate(), {
+    USER_EMAIL: userEmail,
+    COMPANY_NAME: companyName,
+    POSITION_TITLE: positionTitle,
+    CONTACT_NAME: contactName ?? "Hiring manager",
+    DAYS_SINCE_APPLICATION: String(daysSinceApplication),
+    APPLIED_AT: appliedAt ?? "Unknown",
+    NOTES_TEXT: notesText,
+    JOB_DESCRIPTION_EXCERPT: jobDescriptionExcerpt ?? "Not provided",
+    RESUME_CONTEXT: resumeContext,
+  })
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -147,8 +158,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "system",
-          content:
-            "You are an expert job search coach helping candidates follow up with prospective employers. Provide thoughtful emails that show enthusiasm without being pushy.",
+          content: getFollowUpSystemPrompt(),
         },
         { role: "user", content: userPrompt },
       ],
