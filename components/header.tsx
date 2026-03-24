@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { useSWRConfig } from "swr"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import {
   LayoutDashboard,
   Mail,
@@ -58,9 +59,11 @@ export function Header() {
   const { mutate } = useSWRConfig()
   const { supabase, user, isLoading: isAuthLoading } = useSupabase()
   const { settings, updateSetting } = useSettings()
+  const { resolvedTheme } = useTheme()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+  const logoSrc = resolvedTheme === "dark" ? "/logo_cropped.png" : "/logo_cropped_black.png"
   const userAvatar = useMemo(() => {
     const metadata = user?.user_metadata as { picture?: string; avatar_url?: string } | undefined
     return metadata?.picture ?? metadata?.avatar_url ?? null
@@ -91,7 +94,7 @@ export function Header() {
                 >
                   <Link href="/">
                     <Image
-                      src="/logo_cropped.png"
+                      src={logoSrc}
                       alt="ferm.dev logo"
                       width={24}
                       height={24}

@@ -530,6 +530,8 @@ const superchargeFeatures = [
         { label: "Custom drafts", value: "Unlimited" },
         { label: "Reply rate lift", value: "+22%" },
       ],
+      mediaSrc: "/gifs/login_ferm_demo.gif",
+      mediaType: "GIF placeholder",
       screenshotLabel: "Follow-up email preview",
     },
   },
@@ -546,6 +548,8 @@ const superchargeFeatures = [
         { label: "Experience fit", value: "Strong" },
         { label: "Culture alignment", value: "High" },
       ],
+      mediaSrc: "/gifs/parsing_job_demo.gif",
+      mediaType: "GIF placeholder",
       screenshotLabel: "Job scoring dashboard snapshot",
     },
   },
@@ -562,6 +566,8 @@ const superchargeFeatures = [
         { label: "Voice mode", value: "Planned" },
         { label: "Launch", value: "Coming soon" },
       ],
+      mediaSrc: "/gifs/dash_demo.gif",
+      mediaType: "GIF placeholder",
       screenshotLabel: "Interview prep preview (coming soon)",
     },
   },
@@ -591,16 +597,12 @@ export default function LandingPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isVideoOpen, setIsVideoOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [displayedGif, setDisplayedGif] = useState({ panelIndex: 0, version: 0 })
-  const [incomingGif, setIncomingGif] = useState<{ panelIndex: number; version: number } | null>(null)
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [displayedText, setDisplayedText] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedFeature, setSelectedFeature] = useState<string>("follow-ups")
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
   const lastScrollY = useRef(0)
-  const latestGifRequest = useRef(0)
-  const gifPlaybackVersions = useRef(chromeExtensionPanels.map(() => 0))
 
   const handleSwitchToSignUp = () => {
     setIsLoginOpen(false)
@@ -674,30 +676,6 @@ export default function LandingPage() {
       router.replace(redirectedFrom || "/")
     }
   }, [isLoading, redirectedFrom, router, session])
-
-  const getGifSrc = (panelIndex: number, version: number) =>
-    `${chromeExtensionPanels[panelIndex].gifSrc}?v=${version}`
-
-  const preloadAndQueueGif = (panelIndex: number, version: number) => {
-    if (typeof window === "undefined") {
-      setIncomingGif({ panelIndex, version })
-      return
-    }
-
-    const requestId = latestGifRequest.current + 1
-    latestGifRequest.current = requestId
-
-    const preloadImage = new window.Image()
-    preloadImage.src = getGifSrc(panelIndex, version)
-    preloadImage.onload = () => {
-      if (latestGifRequest.current !== requestId) return
-      setIncomingGif({ panelIndex, version })
-    }
-    preloadImage.onerror = () => {
-      if (latestGifRequest.current !== requestId) return
-      setIncomingGif({ panelIndex, version })
-    }
-  }
 
   const handleGoogle = async () => {
     if (typeof window === "undefined") return
@@ -926,12 +904,7 @@ export default function LandingPage() {
                     <button
                       key={panel.title}
                       type="button"
-                      onClick={() => {
-                        setActiveIndex(index)
-                        const nextVersion = gifPlaybackVersions.current[index] + 1
-                        gifPlaybackVersions.current[index] = nextVersion
-                        preloadAndQueueGif(index, nextVersion)
-                      }}
+                      onClick={() => setActiveIndex(index)}
                       className={`group relative flex h-full overflow-hidden rounded-xl border p-5 text-left transition-all duration-300 ${
                         isActive
                           ? "border-foreground/30 bg-muted shadow-lg"
@@ -974,29 +947,14 @@ export default function LandingPage() {
                     </div>
                     <div className="relative flex-1 bg-black/30">
                       <Image
-                        key={`displayed-${displayedGif.panelIndex}-${displayedGif.version}`}
-                        src={getGifSrc(displayedGif.panelIndex, displayedGif.version)}
-                        alt={chromeExtensionPanels[displayedGif.panelIndex].gifAlt}
+                        key={chromeExtensionPanels[activeIndex].gifSrc}
+                        src={chromeExtensionPanels[activeIndex].gifSrc}
+                        alt={chromeExtensionPanels[activeIndex].gifAlt}
                         fill
                         className="object-cover"
                         sizes=""
                         unoptimized
                       />
-                      {incomingGif ? (
-                        <Image
-                          key={`incoming-${incomingGif.panelIndex}-${incomingGif.version}`}
-                          src={getGifSrc(incomingGif.panelIndex, incomingGif.version)}
-                          alt={chromeExtensionPanels[incomingGif.panelIndex].gifAlt}
-                          fill
-                          className="object-cover"
-                          sizes=""
-                          unoptimized
-                          onLoad={() => {
-                            setDisplayedGif(incomingGif)
-                            setIncomingGif(null)
-                          }}
-                        />
-                      ) : null}
                     </div>
                   </div>
                   {/* Floating badge */}
@@ -1075,7 +1033,18 @@ export default function LandingPage() {
 
                           {/* Screenshot area - image container only */}
                           <div className="mt-8 overflow-hidden rounded-2xl border border-border/50 bg-muted/20 p-4">
-                            <div className="aspect-[21/9] rounded-xl border border-border/50 bg-zinc-900/60" />
+                            <div className="relative aspect-[21/9] overflow-hidden rounded-xl border border-border/50 bg-zinc-900/60">
+                              <Image
+                                src={feature.bentoContent.mediaSrc}
+                                alt={feature.bentoContent.screenshotLabel}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                              <div className="absolute right-3 top-3 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs font-medium text-white">
+                                {feature.bentoContent.mediaType} — replace when ready
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )
