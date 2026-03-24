@@ -1198,7 +1198,7 @@ export default function PrepPage() {
 
 
   return (
-    <div className="min-h-screen overflow-hidden ">
+    <div className="adaptive-scroll-layout min-h-screen overflow-hidden ">
       <Header />
       <main className="mx-auto max-w-[83rem] px-3 sm:px-6 pt-24 pb-4">
         <Card className="overflow-hidden border-border/70 shadow-xl">

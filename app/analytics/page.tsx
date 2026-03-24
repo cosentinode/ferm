@@ -484,10 +484,10 @@ export default function AnalyticsPage() {
 
 
   return (
-    <div className="flex min-h-screen flex-col bg-background overflow-hidden">
+    <div className="adaptive-scroll-layout flex min-h-screen flex-col bg-background overflow-hidden">
       <Header />
       <main className="flex-1 overflow-hidden px-6 pt-24">
-        <div className="mx-auto flex h-full max-w-7xl flex-col gap-5 overflow-hidden">
+        <div className="adaptive-scroll-content mx-auto flex h-full max-w-7xl flex-col gap-5 overflow-hidden">
           <section>
             <Card>
               <CardContent className="space-y-4">

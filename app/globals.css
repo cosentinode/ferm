@@ -151,3 +151,21 @@
     display: none !important;
   }
 }
+
+@media (max-height: 840px) {
+  .adaptive-scroll-layout {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .adaptive-scroll-layout > main {
+    overflow: visible !important;
+  }
+
+  .adaptive-scroll-content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

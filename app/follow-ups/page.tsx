@@ -285,10 +285,10 @@ export default function FollowUpsPage() {
   }, [reminderDialog, updateFollowUp])
 
   return (
-    <div className="flex h-screen flex-col bg-background overflow-hidden">
+    <div className="adaptive-scroll-layout flex h-screen flex-col bg-background overflow-hidden">
       <Header />
       <main className="flex-1 overflow-hidden px-6 pb-4 pt-24">
-        <div className="mx-auto flex h-full max-w-7xl flex-col space-y-8 overflow-hidden">
+        <div className="adaptive-scroll-content mx-auto flex h-full max-w-7xl flex-col space-y-8 overflow-hidden">
           <section className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <CardHeader className="gap-3">
