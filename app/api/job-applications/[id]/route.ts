@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 import type { UpdateJobApplicationData } from "@/lib/types/database"
 import { toNullableString } from "@/lib/utils"
 import { isStatusProgressionAllowed, normalizeStatusValue, parseStatus } from "@/lib/status"
@@ -122,6 +123,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
     userId = user.id
+
+    const rateLimitResponse = await enforceRateLimit({
+      request,
+      userId: user.id,
+      keyPrefix: "job-applications-update",
+    })
+    if (rateLimitResponse) {
+      return rateLimitResponse
+    }
+
     const rawBody = await request.text()
 
     if (rawBody.length > MAX_BODY_CHARS || Buffer.byteLength(rawBody, "utf8") > MAX_BODY_BYTES) {
@@ -318,6 +329,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+    const rateLimitResponse = await enforceRateLimit({
+      request,
+      userId: user.id,
+      keyPrefix: "job-applications-delete",
+    })
+    if (rateLimitResponse) {
+      return rateLimitResponse
     }
     const { id } = params
 

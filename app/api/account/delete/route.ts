@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -76,6 +77,17 @@ export async function POST(request: NextRequest) {
 
     if (error || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const rateLimitResponse = await enforceRateLimit({
+      request,
+      userId: user.id,
+      keyPrefix: "account-delete",
+      maxRequests: 5,
+      windowMs: 60_000,
+    })
+    if (rateLimitResponse) {
+      return rateLimitResponse
     }
 
     await deleteUserData(user.id)

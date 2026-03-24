@@ -4,6 +4,7 @@ import { z } from "zod"
 
 import { resolveOpenAIApiKey, USER_OPENAI_KEY_HEADER } from "@/lib/ai/keys"
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 const BodySchema = z.object({
   chatId: z.string().uuid(),
@@ -44,6 +45,16 @@ export async function POST(request: NextRequest) {
   const auth = await getAuthedClient(request)
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-chat-title",
+  })
+  if (rateLimitResponse) {
+    rateLimitResponse.headers.set("Vary", `Authorization, ${USER_OPENAI_KEY_HEADER}`)
+    return rateLimitResponse
   }
 
   const { data: chat, error: chatError } = await auth.supabase

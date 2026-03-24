@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import Groq from "groq-sdk"
 
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 import { buildPrepContext } from "../context"
 
 type ChatHistory = { role: string; content: string }[]
@@ -71,6 +72,15 @@ export async function POST(request: NextRequest) {
   const auth = await getAuthedClient(request)
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-voice",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   const groq = getGroqClient()

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 import { decryptApiKey, encryptApiKey, normalizeApiKey } from "@/lib/ai/keys"
 
 const PROVIDER = "openai"
@@ -87,6 +88,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
   }
 
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "ai-keys-upsert",
+    maxRequests: 10,
+    windowMs: 60_000,
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   let payload: z.infer<typeof BodySchema>
   try {
     payload = BodySchema.parse(await request.json())
@@ -145,6 +157,17 @@ export async function DELETE(request: NextRequest) {
   const auth = await getAuthedClient(request)
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "ai-keys-delete",
+    maxRequests: 10,
+    windowMs: 60_000,
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   const { error } = await auth.supabase

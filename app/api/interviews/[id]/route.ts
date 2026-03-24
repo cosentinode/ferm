@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import type { UpdateInterviewData } from "@/lib/types/database"
 import { requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -28,6 +29,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const rateLimitResponse = await enforceRateLimit({
+      request,
+      userId: user.id,
+      keyPrefix: "interviews-update",
+    })
+    if (rateLimitResponse) {
+      return rateLimitResponse
     }
 
     const body: Partial<UpdateInterviewData> = await request.json()
@@ -187,6 +197,15 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const rateLimitResponse = await enforceRateLimit({
+      request,
+      userId: user.id,
+      keyPrefix: "interviews-delete",
+    })
+    if (rateLimitResponse) {
+      return rateLimitResponse
     }
 
     const { error } = await supabase.from("interviews").delete().eq("id", id).eq("user_id", user.id)

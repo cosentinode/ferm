@@ -3,6 +3,7 @@ import { isValid } from "date-fns"
 import { z } from "zod"
 
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -50,6 +51,15 @@ export async function POST(request: NextRequest) {
   const auth = await getAuthedClient(request)
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "follow-ups-update",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   const payload = UpdateFollowUpSchema.safeParse(await request.json())

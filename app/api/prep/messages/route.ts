@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 const AppendSchema = z.object({
   chatId: z.string().uuid(),
@@ -71,6 +72,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
   }
 
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-messages-create",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   let payload: z.infer<typeof AppendSchema>
 
   try {
@@ -129,6 +139,15 @@ export async function PATCH(request: NextRequest) {
   const auth = await getAuthedClient(request)
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-messages-update",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   let payload: z.infer<typeof UpdateSchema>

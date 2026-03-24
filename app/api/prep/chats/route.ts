@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 const CreateChatSchema = z.object({
   interviewId: z.string().uuid().nullable().optional(),
@@ -74,6 +75,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
   }
 
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-chats-create",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   let payload: z.infer<typeof CreateChatSchema>
 
   try {
@@ -138,6 +148,15 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
   }
 
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-chats-update",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   let payload: z.infer<typeof UpdateChatSchema>
 
   try {
@@ -174,6 +193,15 @@ export async function DELETE(request: NextRequest) {
   const auth = await getAuthedClient(request)
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error.message }, { status: auth.error.status })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: auth.userId,
+    keyPrefix: "prep-chats-delete",
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   const searchParams = new URL(request.url).searchParams

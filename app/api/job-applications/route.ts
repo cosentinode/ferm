@@ -8,6 +8,7 @@ import { getLatestResumeText } from "@/lib/resume/server"
 import { toNullableString } from "@/lib/utils"
 import { expandStatusFilters, normalizeStatusValue, parseStatus } from "@/lib/status"
 import { getAuthedClient, requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 import { resolveOpenAIApiKey, USER_OPENAI_KEY_HEADER } from "@/lib/ai/keys"
 
 export const runtime = "nodejs"
@@ -202,6 +203,17 @@ export async function GET(request: NextRequest) {
     const auth = await getAuthedClient(request)
     if ("error" in auth) {
       return NextResponse.json({ error: auth.error.message }, { status: auth.error.status, headers: corsHeaders })
+    }
+
+    const rateLimitResponse = await enforceRateLimit({
+      request,
+      userId: auth.userId,
+      keyPrefix: "job-applications-create",
+    })
+    if (rateLimitResponse) {
+      Object.entries(corsHeaders).forEach(([header, value]) => rateLimitResponse.headers.set(header, value))
+      addVaryHeader(rateLimitResponse, `Authorization, ${USER_OPENAI_KEY_HEADER}`)
+      return rateLimitResponse
     }
 
     const { supabase, userId } = auth

@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import { refreshResumeText } from "@/lib/resume/server"
 import { requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 const BodySchema = z
   .object({
@@ -29,6 +30,17 @@ export async function POST(request: NextRequest) {
 
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: user.id,
+    keyPrefix: "resume-refresh",
+    maxRequests: 15,
+    windowMs: 60_000,
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   let path: string | undefined
@@ -83,6 +95,17 @@ export async function DELETE(request: NextRequest) {
 
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: user.id,
+    keyPrefix: "resume-refresh-delete",
+    maxRequests: 10,
+    windowMs: 60_000,
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   const admin = createAdminSupabaseClient()

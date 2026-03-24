@@ -5,6 +5,7 @@ import { isIP } from "node:net"
 import { lookup } from "node:dns/promises"
 
 import { requireCookieCsrf } from "@/lib/api/auth"
+import { enforceRateLimit } from "@/lib/api/rate-limit"
 
 const RequestBodySchema = z.object({
   job_url: z.string().url(),
@@ -278,6 +279,28 @@ export async function POST(request: NextRequest) {
 
   if (!userResp.ok) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  let user: { id?: string } | null = null
+  try {
+    user = (await userResp.json()) as { id?: string }
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  if (!user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const rateLimitResponse = await enforceRateLimit({
+    request,
+    userId: user.id,
+    keyPrefix: "scrape-job",
+    maxRequests: 20,
+    windowMs: 60_000,
+  })
+  if (rateLimitResponse) {
+    return rateLimitResponse
   }
 
   let bodyUnknown: unknown
