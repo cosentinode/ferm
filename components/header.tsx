@@ -7,14 +7,10 @@ import { useSWRConfig } from "swr"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
-  LayoutDashboard,
   Mail,
-  BarChart3,
   LogOut,
   UserRound,
-  FileText,
   Settings,
-  CalendarClock,
   Laptop,
   Moon,
   SunMedium,
@@ -39,12 +35,12 @@ import { useSettings } from "@/components/settings-provider"
 import { themeOptions, type ThemePreference } from "@/lib/settings"
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Follow-ups", href: "/follow-ups", icon: Mail },
-  { label: "Interviews", href: "/interviews", icon: CalendarClock },
-  // { label: "Prep", href: "/prep", icon: MessageCircle },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
-  { label: "Resume", href: "/resume", icon: FileText },
+  { label: "Dashboard", href: "/" },
+  { label: "Follow-ups", href: "/follow-ups" },
+  { label: "Interviews", href: "/interviews" },
+  { label: "Prep", href: "/prep" },
+  { label: "Analytics", href: "/analytics" },
+  { label: "Resume", href: "/resume" },
 ] as const
 
 const themeIconMap: Record<ThemePreference, typeof SunMedium> = {
@@ -103,12 +99,6 @@ export function Header() {
                     />
                   </Link>
                 </IconButton>
-                {/* <Link
-                  href="/"
-                  className="text-xl font-semibold text-balance hover:text-primary transition-colors"
-                >
-                  ferm.dev
-                </Link> */}
               </div>
             </div>
             <nav className="hidden md:flex items-center justify-center gap-6 text-sm">

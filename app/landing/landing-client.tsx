@@ -15,12 +15,6 @@ import {
   Sparkles,
   Twitter,
   Youtube,
-  Target,
-  TrendingUp,
-  MessageSquare,
-  Mail,
-  Star,
-  Clock,
 } from "lucide-react"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -467,21 +461,18 @@ const chromeExtensionPanels = [
   {
     title: "Sign in with Google",
     description: "Authenticate so we know where to send the job details to",
-    icon: Target,
     gifSrc: "/gifs/login_ferm_demo.gif",
     gifAlt: "Chrome extension demo showing auth.",
   },
   {
     title: "Click the button",
     description: "No need to wait for processing to finish",
-    icon: TrendingUp,
     gifSrc: "/gifs/parsing_job_demo.gif",
     gifAlt: "Chrome extension demo showing button interaction.",
   },
   {
     title: "Check back on platform",
     description: "You'll see all the job info, as well as your position fit score",
-    icon: Clock,
     gifSrc: "/gifs/dash_demo.gif",
     gifAlt: "Chrome extension demo showing going back to site.",
   },
@@ -520,16 +511,9 @@ const superchargeFeatures = [
   {
     id: "follow-ups",
     title: "Follow-up Emails",
-    icon: Mail,
     bentoContent: {
       headline: "Generate polished follow-up drafts in seconds",
       subtext: "Stay consistent after every interview with context-aware follow-up emails that sound natural and personalized.",
-      features: [
-        { label: "Suggested send time", value: "Next morning" },
-        { label: "Tone", value: "Professional + warm" },
-        { label: "Custom drafts", value: "Unlimited" },
-        { label: "Reply rate lift", value: "+22%" },
-      ],
       mediaSrc: "/gifs/login_ferm_demo.gif",
       mediaType: "GIF placeholder",
       screenshotLabel: "Follow-up email preview",
@@ -538,16 +522,9 @@ const superchargeFeatures = [
   {
     id: "job-scoring",
     title: "Job Scoring",
-    icon: Star,
     bentoContent: {
       headline: "Know your match before you apply",
       subtext: "AI analyzes job requirements against your profile to show compatibility and highlight skill gaps.",
-      features: [
-        { label: "Match score", value: "87%" },
-        { label: "Skills matched", value: "12/14" },
-        { label: "Experience fit", value: "Strong" },
-        { label: "Culture alignment", value: "High" },
-      ],
       mediaSrc: "/gifs/parsing_job_demo.gif",
       mediaType: "GIF placeholder",
       screenshotLabel: "Job scoring dashboard snapshot",
@@ -556,16 +533,9 @@ const superchargeFeatures = [
   {
     id: "interview-prep",
     title: "Interview Prep (coming soon)",
-    icon: MessageSquare,
     bentoContent: {
       headline: "AI Interview Prep is coming soon",
       subtext: "We are building guided interview practice with tailored questions and instant feedback based on your target role.",
-      features: [
-        { label: "Role-specific prompts", value: "Planned" },
-        { label: "Answer scoring", value: "Planned" },
-        { label: "Voice mode", value: "Planned" },
-        { label: "Launch", value: "Coming soon" },
-      ],
       mediaSrc: "/gifs/dash_demo.gif",
       mediaType: "GIF placeholder",
       screenshotLabel: "Interview prep preview (coming soon)",
@@ -1037,7 +1007,6 @@ export default function LandingPage() {
             {/* Feature selector (individual bordered containers) */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {superchargeFeatures.map((feature) => {
-                const Icon = feature.icon
                 const isSelected = selectedFeature === feature.id
 
                 return (
@@ -1051,7 +1020,6 @@ export default function LandingPage() {
                         : "border-border bg-card/40 text-muted-foreground hover:border-foreground/20 hover:text-foreground"
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
                     <h3 className="font-semibold">{feature.title}</h3>
                   </button>
                 )

@@ -1115,17 +1115,6 @@ export default function InterviewsPage() {
                             )}
                           </div>
                           <div className="flex flex-wrap items-center gap-2">
-                            {/* {selectedInterview.interview_type ? (
-                              <Badge
-                                variant="outline"
-                                className={cn(
-                                  "h-9 items-center rounded-md px-3 text-sm",
-                                  statusClassMap[selectedInterview.status],
-                                )}
-                              >
-                                {selectedInterview.interview_type}
-                              </Badge>
-                            ) : null} */}
                             <Button
                               variant="secondary"
                               size="sm"

@@ -62,23 +62,6 @@ const CustomSankeyNode = ({ x, y, width, height, payload }: {
         stroke="hsl(var(--background))"
         strokeWidth={1}
       />
-      {/* <text
-        x={x + width + 8}
-        y={labelY}
-        textAnchor="start"
-        alignmentBaseline="middle"
-        style={{
-          fontSize: "25px",
-          fontWeight: 800,
-          fill: "hsl(var(--foreground))",
-          paintOrder: "stroke",
-          stroke: "hsl(var(--background) / 0.75)",
-          strokeWidth: 3,
-          strokeLinejoin: "round",
-        }}
-      >
-        {payload.name}
-      </text> */}
       <text
         x={labelX}
         y={labelY}

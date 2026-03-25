@@ -18,15 +18,8 @@ yarn-error.log*
 
 # env files
 .env*
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
 cloudbuild.yaml
->>>>>>> d030b4c (Update .gitignore)
-=======
-cloudbuild.yaml
->>>>>>> d030b4c496af7c51ceca0c71f1ae98a97a08fce6
 # vercel
 .vercel
 
