@@ -48,6 +48,8 @@ type FollowUpRow = {
   status: "due" | "upcoming" | "disabled"
 }
 
+type ReminderUrgency = "far" | "soon" | "near" | "overdue" | "none"
+
 type ReminderDialogState = {
   application: JobApplication
   date: Date | null
@@ -131,6 +133,59 @@ function isWithinDateRange(date: Date | null, startDate: string, endDate: string
   if (endDate && value > endDate) return false
 
   return true
+}
+
+function getReminderUrgency(row: FollowUpRow): ReminderUrgency {
+  if (!row.enabled || !row.nextReminder) {
+    return "none"
+  }
+
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+  const reminderDate = new Date(row.nextReminder)
+  reminderDate.setHours(0, 0, 0, 0)
+
+  const millisecondsUntilReminder = reminderDate.getTime() - now.getTime()
+  const daysUntilReminder = Math.ceil(millisecondsUntilReminder / (1000 * 60 * 60 * 24))
+
+  if (daysUntilReminder <= 0) {
+    return "overdue"
+  }
+  if (daysUntilReminder <= 2) {
+    return "near"
+  }
+  if (daysUntilReminder <= 5) {
+    return "soon"
+  }
+  return "far"
+}
+
+function getReminderCardTone(urgency: ReminderUrgency): string {
+  switch (urgency) {
+    case "overdue":
+    case "near":
+      return "bg-red-50/60 dark:bg-red-950/30"
+    case "soon":
+      return "bg-yellow-50/60 dark:bg-yellow-950/20"
+    case "far":
+      return "bg-emerald-50/50 dark:bg-emerald-950/20"
+    default:
+      return ""
+  }
+}
+
+function getReminderTableRowTone(urgency: ReminderUrgency): string {
+  switch (urgency) {
+    case "overdue":
+    case "near":
+      return "[&>td]:bg-red-50/40 dark:[&>td]:bg-red-950/15"
+    case "soon":
+      return "[&>td]:bg-yellow-50/40 dark:[&>td]:bg-yellow-950/10"
+    case "far":
+      return "[&>td]:bg-emerald-50/30 dark:[&>td]:bg-emerald-950/10"
+    default:
+      return ""
+  }
 }
 
 export default function FollowUpsPage() {
@@ -438,6 +493,7 @@ export default function FollowUpsPage() {
                 <div className="space-y-4 overflow-y-auto md:hidden">
                   {sortedRows.map((row) => {
                     const isPending = pending[row.application.id]
+                    const reminderUrgency = getReminderUrgency(row)
                     const appliedDate = getDateOrNull(row.application.application_date)
                     const appliedLabel = appliedDate ? format(appliedDate, "MMM d, yyyy") : "Date unavailable"
                     const nextReminderLabel = row.enabled && row.nextReminder
@@ -448,7 +504,10 @@ export default function FollowUpsPage() {
                     const lastReminderLabel = row.lastSent ? format(row.lastSent, "MMM d, yyyy") : "Never"
 
                     return (
-                      <div key={row.application.id} className="rounded-md border p-4">
+                      <div
+                        key={row.application.id}
+                        className={cn("rounded-md border p-4 transition-colors", getReminderCardTone(reminderUrgency))}
+                      >
                         <div className="flex items-start justify-between gap-3">
                           <div className="space-y-1">
                             <p className="text-sm font-medium leading-tight">{row.application.company_name ?? "Unknown company"}</p>
@@ -776,6 +835,7 @@ export default function FollowUpsPage() {
                     <TableBody>
                       {sortedRows.map((row) => {
                           const isPending = pending[row.application.id]
+                          const reminderUrgency = getReminderUrgency(row)
                           const appliedDate = getDateOrNull(row.application.application_date)
                           const appliedLabel = appliedDate ? format(appliedDate, "MMM d, yyyy") : "Date unavailable"
                           const nextReminderLabel = row.enabled && row.nextReminder
@@ -787,7 +847,7 @@ export default function FollowUpsPage() {
                         return (
                           <TableRow
                             key={row.application.id}
-                            className={`align-top [&>td]:py-5 transition-colors `}
+                            className={cn("align-top [&>td]:py-5 transition-colors", getReminderTableRowTone(reminderUrgency))}
                           >
                             <TableCell className="px-4 text-center">
                               <div className="flex flex-col items-center space-y-1">
