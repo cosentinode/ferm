@@ -6,7 +6,6 @@ import { CalendarClock, Filter, LayoutPanelLeft, Plus, Search, Table2, X } from 
 
 import { Header } from "@/components/header"
 import { JobApplicationCard } from "@/components/job-application-card"
-import { StatsOverview } from "@/components/stats-overview"
 import { BulkActions } from "@/components/bulk-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -437,10 +436,6 @@ export default function Dashboard() {
       <Header />
       <main className="flex-1 overflow-hidden px-6 pt-24">
         <div className="adaptive-scroll-content flex h-full w-full flex-col space-y-6 overflow-hidden">
-          <div className="shrink-0">
-            <StatsOverview />
-          </div>
-
           <div className="grid h-full grid-cols-1 gap-6 overflow-hidden lg:grid-cols-[320px_minmax(0,1fr)]">
             <div className="flex flex-col gap-6 overflow-hidden">
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -719,7 +714,7 @@ export default function Dashboard() {
 
                       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border bg-card/40">
                         <ScrollArea className="flex-1">
-                          <div className="relative mx-auto w-full max-w-4xl space-y-6 p-6">
+                          <div className="relative w-full space-y-6 p-6">
                             {isLoading ? (
                               <div className="space-y-4">
                                 {[...Array(4)].map((_, index) => (
