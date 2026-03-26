@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { format, formatDistanceToNow } from "date-fns"
-import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal, RotateCcw } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, Filter, MoreHorizontal, RotateCcw, Search, X } from "lucide-react"
 import { Header } from "@/components/header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar } from "@/components/ui/calendar"
 import { useToast } from "@/components/ui/use-toast"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { apiFetch } from "@/lib/fetcher"
 import { TruncatedText } from "@/components/ui/truncate"
@@ -52,6 +55,7 @@ type ReminderDialogState = {
 
 type SortValue = "company" | "applied" | "next" | "last" | "status"
 type SortDirection = "asc" | "desc"
+type StatusFilter = FollowUpRow["status"]
 
 const sortDirectionDefaults: Record<SortValue, SortDirection> = {
   company: "asc",
@@ -105,6 +109,25 @@ function dateToLocalISOString(date: Date | null): string | null {
   return Number.isNaN(localDate.getTime()) ? null : localDate.toISOString()
 }
 
+function toDateInputValue(date: Date | null): string {
+  if (!date) return ""
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
+function isWithinDateRange(date: Date | null, startDate: string, endDate: string): boolean {
+  if (!startDate && !endDate) return true
+  if (!date) return false
+
+  const value = toDateInputValue(date)
+  if (startDate && value < startDate) return false
+  if (endDate && value > endDate) return false
+
+  return true
+}
+
 export default function FollowUpsPage() {
   const { toast } = useToast()
   const {
@@ -118,6 +141,14 @@ export default function FollowUpsPage() {
   const [reminderDialog, setReminderDialog] = useState<ReminderDialogState | null>(null)
   const [sortBy, setSortBy] = useState<SortValue>("next")
   const [sortDirection, setSortDirection] = useState<SortDirection>(sortDirectionDefaults.next)
+  const [applicationQuery, setApplicationQuery] = useState("")
+  const [appliedStartDate, setAppliedStartDate] = useState("")
+  const [appliedEndDate, setAppliedEndDate] = useState("")
+  const [nextReminderStartDate, setNextReminderStartDate] = useState("")
+  const [nextReminderEndDate, setNextReminderEndDate] = useState("")
+  const [lastReminderStartDate, setLastReminderStartDate] = useState("")
+  const [lastReminderEndDate, setLastReminderEndDate] = useState("")
+  const [statusFilters, setStatusFilters] = useState<StatusFilter[]>([])
 
   const handleDraftUpdated = useCallback(
     (applicationId: string, update: { draft: string; generatedAt?: string | null }) => {
@@ -174,6 +205,42 @@ export default function FollowUpsPage() {
   }, [applications, followUps])
 
 
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
+      const normalizedQuery = applicationQuery.trim().toLowerCase()
+      const company = (row.application.company_name ?? "").toLowerCase()
+      const title = (row.application.position_title ?? "").toLowerCase()
+      const appliedDate = getDateOrNull(row.application.application_date)
+
+      if (normalizedQuery && !company.includes(normalizedQuery) && !title.includes(normalizedQuery)) {
+        return false
+      }
+      if (!isWithinDateRange(appliedDate, appliedStartDate, appliedEndDate)) {
+        return false
+      }
+      if (!isWithinDateRange(row.nextReminder, nextReminderStartDate, nextReminderEndDate)) {
+        return false
+      }
+      if (!isWithinDateRange(row.lastSent, lastReminderStartDate, lastReminderEndDate)) {
+        return false
+      }
+      if (statusFilters.length > 0 && !statusFilters.includes(row.status)) {
+        return false
+      }
+      return true
+    })
+  }, [
+    applicationQuery,
+    appliedEndDate,
+    appliedStartDate,
+    lastReminderEndDate,
+    lastReminderStartDate,
+    nextReminderEndDate,
+    nextReminderStartDate,
+    rows,
+    statusFilters,
+  ])
+
   const sortedRows = useMemo(() => {
     const directionMultiplier = sortDirection === "asc" ? 1 : -1
     const getNextReminderValue = (row: FollowUpRow) =>
@@ -183,7 +250,7 @@ export default function FollowUpsPage() {
           ? Number.POSITIVE_INFINITY
           : Number.NEGATIVE_INFINITY
 
-    const items = [...rows]
+    const items = [...filteredRows]
     switch (sortBy) {
       case "status": {
         const priority: Record<FollowUpRow["status"], number> = { due: 0, upcoming: 1, disabled: 2 }
@@ -225,7 +292,29 @@ export default function FollowUpsPage() {
       default:
         return items
     }
-  }, [rows, sortBy, sortDirection])
+  }, [filteredRows, sortBy, sortDirection])
+
+  const hasActiveFilters = useMemo(() => {
+    return Boolean(
+      applicationQuery.trim() ||
+      appliedStartDate ||
+      appliedEndDate ||
+      nextReminderStartDate ||
+      nextReminderEndDate ||
+      lastReminderStartDate ||
+      lastReminderEndDate ||
+      statusFilters.length,
+    )
+  }, [
+    applicationQuery,
+    appliedEndDate,
+    appliedStartDate,
+    lastReminderEndDate,
+    lastReminderStartDate,
+    nextReminderEndDate,
+    nextReminderStartDate,
+    statusFilters.length,
+  ])
 
   const isLoading = isLoadingApplications || isLoadingFollowUps
 
@@ -296,6 +385,23 @@ export default function FollowUpsPage() {
     setSortBy(value)
     setSortDirection(sortDirectionDefaults[value])
   }, [sortBy])
+
+  const toggleStatusFilter = useCallback((status: StatusFilter) => {
+    setStatusFilters((previous) =>
+      previous.includes(status) ? previous.filter((current) => current !== status) : [...previous, status],
+    )
+  }, [])
+
+  const resetFilters = useCallback(() => {
+    setApplicationQuery("")
+    setAppliedStartDate("")
+    setAppliedEndDate("")
+    setNextReminderStartDate("")
+    setNextReminderEndDate("")
+    setLastReminderStartDate("")
+    setLastReminderEndDate("")
+    setStatusFilters([])
+  }, [])
 
   return (
     <div className="adaptive-scroll-layout flex h-screen flex-col bg-background overflow-hidden">
@@ -395,7 +501,21 @@ export default function FollowUpsPage() {
                   })}
                 </div>
 
-                <div className="relative hidden min-h-0 overflow-auto rounded-md border md:block md:flex-1">
+                <div className="relative hidden min-h-0 overflow-hidden rounded-lg border bg-card/40 md:block md:flex-1">
+                  {hasActiveFilters && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={resetFilters}
+                      className="absolute right-3 top-3 z-50 h-8 w-8"
+                      aria-label="Reset all table filters"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+
+                  <ScrollArea className="h-full w-full">
                   <table className="w-full table-fixed caption-bottom text-sm">
                     <colgroup>
                       <col className="w-1/6" />
@@ -405,49 +525,195 @@ export default function FollowUpsPage() {
                       <col className="w-1/6" />
                       <col className="w-1/6" />
                     </colgroup>
-                    <TableHeader className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90">
+                    <TableHeader className="sticky top-0 z-30 bg-muted">
                       <TableRow>
-                        <TableHead className="sticky top-0 z-40 bg-background px-4 py-4 text-center">
-                          <SortHeader
-                            label="Application"
-                            active={sortBy === "company"}
-                            direction={sortDirection}
-                            onClick={() => onSortChange("company")}
-                          />
+                        <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <SortHeader
+                              label="Application"
+                              active={sortBy === "company"}
+                              direction={sortDirection}
+                              onClick={() => onSortChange("company")}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter application column">
+                                  <Filter className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="center" className="w-64 p-3">
+                                <div className="space-y-2">
+                                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Search company or title</p>
+                                  <div className="relative">
+                                    <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                      value={applicationQuery}
+                                      onChange={(event) => setApplicationQuery(event.target.value)}
+                                      placeholder="Company or title"
+                                      className="h-8 pl-7"
+                                    />
+                                  </div>
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
-                        <TableHead className="sticky top-0 z-40 bg-background px-4 py-4 text-center">
-                          <SortHeader
-                            label="Applied"
-                            active={sortBy === "applied"}
-                            direction={sortDirection}
-                            onClick={() => onSortChange("applied")}
-                          />
+                        <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <SortHeader
+                              label="Applied"
+                              active={sortBy === "applied"}
+                              direction={sortDirection}
+                              onClick={() => onSortChange("applied")}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter applied column">
+                                  <Filter className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="center" className="w-64 p-3">
+                                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Applied range</p>
+                                <div className="space-y-2">
+                                  <div>
+                                    <p className="mb-1 text-xs text-muted-foreground">From</p>
+                                    <Input
+                                      type="date"
+                                      value={appliedStartDate}
+                                      onChange={(event) => setAppliedStartDate(event.target.value)}
+                                      className="h-8"
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className="mb-1 text-xs text-muted-foreground">To</p>
+                                    <Input
+                                      type="date"
+                                      value={appliedEndDate}
+                                      onChange={(event) => setAppliedEndDate(event.target.value)}
+                                      className="h-8"
+                                    />
+                                  </div>
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
-                        <TableHead className="sticky top-0 z-40 bg-background px-4 py-4 text-center">
-                          <SortHeader
-                            label="Next reminder"
-                            active={sortBy === "next"}
-                            direction={sortDirection}
-                            onClick={() => onSortChange("next")}
-                          />
+                        <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <SortHeader
+                              label="Next reminder"
+                              active={sortBy === "next"}
+                              direction={sortDirection}
+                              onClick={() => onSortChange("next")}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter next reminder column">
+                                  <Filter className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="center" className="w-64 p-3">
+                                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Next reminder range</p>
+                                <div className="space-y-2">
+                                  <div>
+                                    <p className="mb-1 text-xs text-muted-foreground">From</p>
+                                    <Input
+                                      type="date"
+                                      value={nextReminderStartDate}
+                                      onChange={(event) => setNextReminderStartDate(event.target.value)}
+                                      className="h-8"
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className="mb-1 text-xs text-muted-foreground">To</p>
+                                    <Input
+                                      type="date"
+                                      value={nextReminderEndDate}
+                                      onChange={(event) => setNextReminderEndDate(event.target.value)}
+                                      className="h-8"
+                                    />
+                                  </div>
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
-                        <TableHead className="sticky top-0 z-40 bg-background px-4 py-4 text-center">
-                          <SortHeader
-                            label="Last reminder"
-                            active={sortBy === "last"}
-                            direction={sortDirection}
-                            onClick={() => onSortChange("last")}
-                          />
+                        <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <SortHeader
+                              label="Last reminder"
+                              active={sortBy === "last"}
+                              direction={sortDirection}
+                              onClick={() => onSortChange("last")}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter last reminder column">
+                                  <Filter className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="center" className="w-64 p-3">
+                                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Last reminder range</p>
+                                <div className="space-y-2">
+                                  <div>
+                                    <p className="mb-1 text-xs text-muted-foreground">From</p>
+                                    <Input
+                                      type="date"
+                                      value={lastReminderStartDate}
+                                      onChange={(event) => setLastReminderStartDate(event.target.value)}
+                                      className="h-8"
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className="mb-1 text-xs text-muted-foreground">To</p>
+                                    <Input
+                                      type="date"
+                                      value={lastReminderEndDate}
+                                      onChange={(event) => setLastReminderEndDate(event.target.value)}
+                                      className="h-8"
+                                    />
+                                  </div>
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
-                        <TableHead className="sticky top-0 z-40 bg-background px-4 py-4 text-center">
-                          <SortHeader
-                            label="Status"
-                            active={sortBy === "status"}
-                            direction={sortDirection}
-                            onClick={() => onSortChange("status")}
-                          />
+                        <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <SortHeader
+                              label="Status"
+                              active={sortBy === "status"}
+                              direction={sortDirection}
+                              onClick={() => onSortChange("status")}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter status column">
+                                  <Filter className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="center" className="w-56 p-3">
+                                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</p>
+                                <div className="space-y-2">
+                                  {[
+                                    { label: "Follow-up due", value: "due" as const },
+                                    { label: "Scheduled", value: "upcoming" as const },
+                                    { label: "Not scheduled", value: "disabled" as const },
+                                  ].map((item) => (
+                                    <label key={item.value} className="flex cursor-pointer items-center gap-2 text-sm">
+                                      <Checkbox
+                                        checked={statusFilters.includes(item.value)}
+                                        onCheckedChange={() => toggleStatusFilter(item.value)}
+                                      />
+                                      <span>{item.label}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
-                        <TableHead className="sticky top-0 z-40 bg-background px-4 py-4 text-center">
+                        <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
                           Actions
                         </TableHead>
                       </TableRow>
@@ -522,6 +788,7 @@ export default function FollowUpsPage() {
                       })}
                     </TableBody>
                   </table>
+                  </ScrollArea>
                 </div>
               </div>
             )}
