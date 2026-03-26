@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { useSWRConfig } from "swr"
 import Image from "next/image"
-import { useTheme } from "next-themes"
 import {
   Mail,
   LogOut,
@@ -55,11 +54,9 @@ export function Header() {
   const { mutate } = useSWRConfig()
   const { supabase, user, isLoading: isAuthLoading } = useSupabase()
   const { settings, updateSetting } = useSettings()
-  const { resolvedTheme } = useTheme()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
-  const logoSrc = resolvedTheme === "dark" ? "/logo_cropped.png" : "/logo_cropped_black.png"
   const userAvatar = useMemo(() => {
     const metadata = user?.user_metadata as { picture?: string; avatar_url?: string } | undefined
     return metadata?.picture ?? metadata?.avatar_url ?? null
@@ -76,7 +73,7 @@ export function Header() {
   }, [mutate, router, supabase])
   return (
     <header className="fixed top-4 left-0 right-0 z-50">
-      <div className="max-w-[83rem] mx-auto px-3 sm:px-6">
+      <div className="w-full px-3 sm:px-6">
         <div className="border border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 rounded-xl shadow-lg">
           <div className="grid h-12 sm:h-14 grid-cols-[auto_1fr_auto] items-center px-3 sm:px-6">
             <div className="flex items-center gap-4 sm:gap-6">
@@ -90,11 +87,19 @@ export function Header() {
                 >
                   <Link href="/">
                     <Image
-                      src={logoSrc}
+                      src="/logo_cropped_black.png"
                       alt="ferm.dev logo"
                       width={24}
                       height={24}
-                      className="h-9 w-5 sm:h-6 sm:w-6 transition-transform duration-700 ease-out group-hover:rotate-[360deg]"
+                      className="h-9 w-5 sm:h-6 sm:w-6 transition-transform duration-700 ease-out group-hover:rotate-[360deg] dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src="/logo_cropped.png"
+                      alt="ferm.dev logo"
+                      width={24}
+                      height={24}
+                      className="hidden h-9 w-5 sm:h-6 sm:w-6 transition-transform duration-700 ease-out group-hover:rotate-[360deg] dark:block"
                       priority
                     />
                   </Link>

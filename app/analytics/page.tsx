@@ -185,7 +185,7 @@ export default function AnalyticsPage() {
   }, [applications])
 
   const sankeyHeight = useMemo(() => {
-    if (!sankeyData.nodes.length) return 320
+    if (!sankeyData.nodes.length) return 340
 
     const baseNode = sankeyData.nodes.find((node) => node.name === SANKEY_BASE_NODE)
     const largestNode = sankeyData.nodes.reduce(
@@ -194,8 +194,8 @@ export default function AnalyticsPage() {
     )
 
     const totalFlow = baseNode?.count ?? largestNode
-    const minHeight = 407
-    const maxHeight = 407
+    const minHeight = 340
+    const maxHeight = 340
     const pixelsPerApplication = 33.9
 
     return Math.max(minHeight, Math.min(maxHeight, totalFlow * pixelsPerApplication))
@@ -470,7 +470,7 @@ export default function AnalyticsPage() {
     <div className="adaptive-scroll-layout flex min-h-screen flex-col bg-background overflow-hidden">
       <Header />
       <main className="flex-1 overflow-hidden px-6 pt-24">
-        <div className="adaptive-scroll-content mx-auto flex h-full max-w-7xl flex-col gap-5 overflow-hidden">
+        <div className="adaptive-scroll-content flex h-full min-h-0 w-full flex-col gap-4 overflow-hidden">
           <section>
             <Card>
               <CardContent className="space-y-4">

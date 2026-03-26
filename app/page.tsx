@@ -422,7 +422,7 @@ export default function Dashboard() {
       <div className="h-screen bg-background">
         <Header />
         <main className="pt-24 p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             <div className="text-center py-12">
               <p className="text-destructive">Error loading applications. Please try again.</p>
             </div>
@@ -436,7 +436,7 @@ export default function Dashboard() {
     <div className="adaptive-scroll-layout flex h-screen flex-col bg-background overflow-hidden">
       <Header />
       <main className="flex-1 overflow-hidden px-6 pt-24">
-        <div className="adaptive-scroll-content mx-auto flex h-full max-w-7xl flex-col space-y-6 overflow-hidden">
+        <div className="adaptive-scroll-content flex h-full w-full flex-col space-y-6 overflow-hidden">
           <div className="shrink-0">
             <StatsOverview />
           </div>
@@ -462,7 +462,7 @@ export default function Dashboard() {
                     }}
                     className="flex min-h-0 flex-1 flex-col gap-4"
                   >
-               <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+               <div className="flex flex-wrap items-center gap-3">
   {/* Tabs */}
   <TabsList className="shrink-0 whitespace-nowrap overflow-x-auto">
     <TabsTrigger value="full" className="gap-2" href={buildDashboardHref({ view: "full" })}>
@@ -479,7 +479,7 @@ export default function Dashboard() {
     </TabsTrigger>
   </TabsList>
   {/* Search bar (flexes) */}
-  <div className="relative flex-1 min-w-[220px] max-w-[520px]">
+  <div className="relative min-w-[240px] flex-1">
     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
     <Input
       value={searchTerm}

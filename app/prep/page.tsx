@@ -1200,7 +1200,7 @@ export default function PrepPage() {
   return (
     <div className="adaptive-scroll-layout min-h-screen overflow-hidden ">
       <Header />
-      <main className="mx-auto max-w-[83rem] px-3 sm:px-6 pt-24 pb-4">
+      <main className="w-full px-3 sm:px-6 pt-24 pb-4">
         <Card className="overflow-hidden border-border/70 shadow-xl">
           <div className="grid h-[calc(100vh-10.1rem)] max-h-[1040px] grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between border-b border-border/60 bg-background/80 px-4 py-3 sm:px-6">
