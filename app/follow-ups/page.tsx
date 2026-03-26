@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { format, formatDistanceToNow } from "date-fns"
-import { ArrowDown, ArrowUp, ArrowUpDown, Filter, MoreHorizontal, RotateCcw, Search, X } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, Filter, Info, MoreHorizontal, RotateCcw, Search, X } from "lucide-react"
 import { Header } from "@/components/header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { apiFetch } from "@/lib/fetcher"
 import { TruncatedText } from "@/components/ui/truncate"
 import { cn } from "@/lib/utils"
@@ -70,7 +71,7 @@ const sortDirectionDefaults: Record<SortValue, SortDirection> = {
 
 const headerIconButtonClassName =
   "inline-flex h-6 w-6 items-center justify-center p-0 text-muted-foreground transition-colors hover:text-foreground"
-const activeHeaderIconButtonClassName = "rounded-sm bg-primary/20 text-primary ring-1 ring-primary/40 hover:text-primary"
+const activeHeaderIconButtonClassName = "text-primary hover:text-primary"
 
 function SortHeader({
   label,
@@ -572,18 +573,41 @@ export default function FollowUpsPage() {
                 </div>
 
                 <div className="relative hidden min-h-0 overflow-hidden rounded-lg border bg-card/40 md:block md:flex-1">
-                  {hasActiveFilters && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      onClick={resetFilters}
-                      className="absolute right-3 top-3 z-50 h-8 w-8"
-                      aria-label="Reset all table filters"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="absolute left-3 top-3 z-50 inline-flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                        aria-label="Reminder row color key"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" align="start" className="max-w-xs space-y-2">
+                      <p className="font-medium">Reminder color key</p>
+                      <ul className="space-y-1">
+                        <li><span className="font-medium text-red-600 dark:text-red-300">Red:</span> overdue or due within 2 days.</li>
+                        <li><span className="font-medium text-yellow-600 dark:text-yellow-300">Yellow:</span> due in 3 to 5 days.</li>
+                        <li><span className="font-medium text-emerald-600 dark:text-emerald-300">Green:</span> due in 6+ days.</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={resetFilters}
+                    disabled={!hasActiveFilters}
+                    className={cn(
+                      "absolute right-3 top-3 z-50 h-8 w-8",
+                      hasActiveFilters
+                        ? "text-destructive hover:text-destructive"
+                        : "text-muted-foreground hover:text-muted-foreground",
+                    )}
+                    aria-label="Reset all table filters"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
 
                   <ScrollArea className="h-full w-full">
                   <table className="w-full table-fixed caption-bottom text-sm">
@@ -889,10 +913,10 @@ export default function FollowUpsPage() {
                                 />
                                 <Button
                                   size="sm"
-                                  variant="outline"
+                                  variant="secondary"
                                   onClick={() => openReminderDialog(row, { isEnabling: !row.enabled })}
                                   disabled={isPending}
-                                  className="w-auto"
+                                  className="w-auto border border-border"
                                 >
                                   Set reminder
                                 </Button>
