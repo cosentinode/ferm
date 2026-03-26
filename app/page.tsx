@@ -636,12 +636,12 @@ export default function Dashboard() {
                                             <TruncatedText
                                               text={application.position_title}
                                               className="text-sm font-medium leading-tight"
-                                              maxWidthClass="max-w-full"
+                                              maxWidthClass="max-w-85"
                                             />
                                             <TruncatedText
                                               text={application.company_name}
                                               className="text-xs text-muted-foreground"
-                                              maxWidthClass="max-w-full"
+                                              maxWidthClass="max-w-85"
                                             />
                                           </div>
                                         </TableCell>
