@@ -65,6 +65,9 @@ const sortDirectionDefaults: Record<SortValue, SortDirection> = {
   status: "asc",
 }
 
+const headerIconButtonClassName =
+  "inline-flex h-6 w-6 items-center justify-center p-0 text-muted-foreground transition-colors hover:text-foreground"
+
 function SortHeader({
   label,
   active,
@@ -80,13 +83,13 @@ function SortHeader({
     <button
       type="button"
       onClick={onClick}
-      className="mx-auto inline-flex items-center justify-center gap-1 font-medium text-foreground transition-colors hover:text-primary"
+      className={headerIconButtonClassName}
+      aria-label={`Sort by ${label}`}
     >
-      <span>{label}</span>
       {active ? (
         direction === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
       ) : (
-        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+        <ArrowUpDown className="h-3.5 w-3.5" />
       )}
     </button>
   )
@@ -529,17 +532,18 @@ export default function FollowUpsPage() {
                       <TableRow>
                         <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <span className="font-medium text-foreground">Application</span>
                             <SortHeader
-                              label="Application"
+                              label="application"
                               active={sortBy === "company"}
                               direction={sortDirection}
                               onClick={() => onSortChange("company")}
                             />
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter application column">
+                                <button type="button" className={headerIconButtonClassName} aria-label="Filter application column">
                                   <Filter className="h-3.5 w-3.5" />
-                                </Button>
+                                </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="center" className="w-64 p-3">
                                 <div className="space-y-2">
@@ -560,17 +564,18 @@ export default function FollowUpsPage() {
                         </TableHead>
                         <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <span className="font-medium text-foreground">Applied</span>
                             <SortHeader
-                              label="Applied"
+                              label="applied date"
                               active={sortBy === "applied"}
                               direction={sortDirection}
                               onClick={() => onSortChange("applied")}
                             />
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter applied column">
+                                <button type="button" className={headerIconButtonClassName} aria-label="Filter applied column">
                                   <Filter className="h-3.5 w-3.5" />
-                                </Button>
+                                </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="center" className="w-64 p-3">
                                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Applied range</p>
@@ -600,17 +605,18 @@ export default function FollowUpsPage() {
                         </TableHead>
                         <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <span className="font-medium text-foreground">Next reminder</span>
                             <SortHeader
-                              label="Next reminder"
+                              label="next reminder"
                               active={sortBy === "next"}
                               direction={sortDirection}
                               onClick={() => onSortChange("next")}
                             />
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter next reminder column">
+                                <button type="button" className={headerIconButtonClassName} aria-label="Filter next reminder column">
                                   <Filter className="h-3.5 w-3.5" />
-                                </Button>
+                                </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="center" className="w-64 p-3">
                                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Next reminder range</p>
@@ -640,17 +646,18 @@ export default function FollowUpsPage() {
                         </TableHead>
                         <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <span className="font-medium text-foreground">Last reminder</span>
                             <SortHeader
-                              label="Last reminder"
+                              label="last reminder"
                               active={sortBy === "last"}
                               direction={sortDirection}
                               onClick={() => onSortChange("last")}
                             />
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter last reminder column">
+                                <button type="button" className={headerIconButtonClassName} aria-label="Filter last reminder column">
                                   <Filter className="h-3.5 w-3.5" />
-                                </Button>
+                                </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="center" className="w-64 p-3">
                                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Last reminder range</p>
@@ -680,17 +687,18 @@ export default function FollowUpsPage() {
                         </TableHead>
                         <TableHead className="sticky top-0 z-40 bg-muted px-4 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <span className="font-medium text-foreground">Status</span>
                             <SortHeader
-                              label="Status"
+                              label="status"
                               active={sortBy === "status"}
                               direction={sortDirection}
                               onClick={() => onSortChange("status")}
                             />
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Filter status column">
+                                <button type="button" className={headerIconButtonClassName} aria-label="Filter status column">
                                   <Filter className="h-3.5 w-3.5" />
-                                </Button>
+                                </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="center" className="w-56 p-3">
                                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</p>
