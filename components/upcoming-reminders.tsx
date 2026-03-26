@@ -172,12 +172,12 @@ export function UpcomingReminders() {
                           <TruncatedText
                             text={reminder.application.company_name}
                             className="text-sm font-medium text-card-foreground"
-                            maxWidthClass="max-w-[14rem]"
+                            maxWidthClass="max-w-[12rem]"
                           />
                           <TruncatedText
                             text={reminder.application.position_title}
                             className="text-xs text-muted-foreground"
-                            maxWidthClass="max-w-[14rem]"
+                            maxWidthClass="max-w-[12rem]"
                           />
                         </div>
                     

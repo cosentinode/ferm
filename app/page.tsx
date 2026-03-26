@@ -729,13 +729,11 @@ export default function Dashboard() {
                               </div>
                             ) : (
                               <>
-                                <div className="absolute left-1.5 top-6 bottom-6 w-px bg-border" aria-hidden />
                                 {applications.map((application) => {
                                   const isSelected = selectedApplications.includes(application.id)
 
                                   return (
-                                    <div key={application.id} className="relative pl-6">
-                                      <span className="absolute left-0 top-2 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-background bg-primary" />
+                                    <div key={application.id}>
                                       <div
                                         className={cn(
                                           "flex flex-col gap-2 rounded-lg border bg-card/50 p-4 transition-colors hover:bg-accent/50",

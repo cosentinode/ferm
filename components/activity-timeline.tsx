@@ -88,13 +88,13 @@ export function ActivityTimeline() {
                   <TruncatedText
                     text={jobTitle ?? "Job title unavailable"}
                     className="text-xs font-medium text-foreground"
-                    maxWidthClass="max-w-[10rem]"
+                    maxWidthClass="max-w-[12rem]"
                   />
                   {companyName ? (
                     <TruncatedText
                       text={companyName}
                       className="text-xs font-medium text-muted-foreground"
-                      maxWidthClass="max-w-[10rem]"
+                      maxWidthClass="max-w-[12rem]"
                     />
                   ) : null}
                   {jobRemoved ? <p className="text-[11px] italic text-muted-foreground">Application removed</p> : null}
@@ -106,7 +106,7 @@ export function ActivityTimeline() {
                 <TruncatedText
                   text={`${item.old_value} -> ${item.new_value}`}
                   className="text-xs text-muted-foreground"
-                  maxWidthClass="max-w-[10rem]"
+                  maxWidthClass="max-w-[12rem]"
                 />
               ) : null}
               <p className="text-xs text-muted-foreground">{formatTimestamp(item.created_at)}</p>
