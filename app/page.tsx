@@ -600,10 +600,12 @@ export default function Dashboard() {
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead className="min-w-[40rem]">Role</TableHead>
-                                    <TableHead className="w-[120px] text-right">Status</TableHead>
-                                    <TableHead className="w-[150px] text-right">Match score</TableHead>
-                                    <TableHead>Applied</TableHead>
-                                    <TableHead className="hidden lg:table-cell w-[190px]">Location</TableHead>
+                                    <TableHead className="w-[120px] text-center">Status</TableHead>
+                                    <TableHead className="w-[150px] text-center">Match score</TableHead>
+                                    <TableHead className="w-[150px] text-center">Employment type</TableHead>
+                                    <TableHead className="w-[170px] text-center">Salary</TableHead>
+                                    <TableHead className="hidden lg:table-cell w-[190px] text-center">Location</TableHead>
+                                    <TableHead className="w-[130px] text-center">Applied</TableHead>
                                     <TableHead className="w-[72px] text-right">Actions</TableHead>
                                   </TableRow>
                                 </TableHeader>
@@ -643,15 +645,15 @@ export default function Dashboard() {
                                             />
                                           </div>
                                         </TableCell>
-                                        <TableCell className="w-[190px] align-middle">
-                                          <div>
+                                        <TableCell className="w-[190px] align-middle text-center">
+                                          <div className="flex justify-center">
                                             <Badge variant="outline" className={getStatusBadgeClass(application.status)}>
-                                            {formatStatusLabel(application.status)}
-                                          </Badge>
+                                              {formatStatusLabel(application.status)}
+                                            </Badge>
                                           </div>
                                         </TableCell>
-                                        <TableCell className="text-justify">
-                                          <div className="flex justify-end">
+                                        <TableCell className="text-center">
+                                          <div className="flex justify-center">
                                             <JobScoreIndicator
                                               score={application.resume_match_score ?? null}
                                               createdAt={application.created_at}
@@ -660,8 +662,37 @@ export default function Dashboard() {
                                             />
                                           </div>
                                         </TableCell>
-                                        <TableCell>
-                                          <div className="flex flex-col">
+                                        <TableCell className="text-center">
+                                          <span className="text-sm">{application.employment_type ?? "—"}</span>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                          {application.salary_range ? (
+                                            <TruncatedText
+                                              as="span"
+                                              text={application.salary_range}
+                                              className="inline-block text-sm"
+                                              maxWidthClass="max-w-[10rem]"
+                                            />
+                                          ) : (
+                                            <span className="text-xs text-muted-foreground">—</span>
+                                          )}
+                                        </TableCell>
+                                        <TableCell className="hidden w-[190px] max-w-[14rem] text-center lg:table-cell">
+                                          {application.location ? (
+                                            <div className="flex justify-center">
+                                              <TruncatedText
+                                                as="span"
+                                                text={application.location}
+                                                className="block text-sm"
+                                                maxWidthClass="max-w-full"
+                                              />
+                                            </div>
+                                          ) : (
+                                            <span className="text-xs text-muted-foreground">—</span>
+                                          )}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                          <div className="flex flex-col items-center">
                                             <span className="text-sm font-medium">
                                               {formatApplicationDate(application.application_date)}
                                             </span>
@@ -669,18 +700,6 @@ export default function Dashboard() {
                                               {formatDaysSinceApplied(application.application_date)}
                                             </span>
                                           </div>
-                                        </TableCell>
-                                        <TableCell className="hidden w-[190px] max-w-[14rem] lg:table-cell">
-                                          {application.location ? (
-                                            <TruncatedText
-                                              as="span"
-                                              text={application.location}
-                                              className="block text-sm"
-                                              maxWidthClass="max-w-full"
-                                            />
-                                          ) : (
-                                            <span className="text-xs text-muted-foreground">—</span>
-                                          )}
                                         </TableCell>
                                         <TableCell className="w-[72px] text-right">
                                           <div className="flex justify-end">
