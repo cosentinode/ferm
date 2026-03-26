@@ -165,11 +165,11 @@ function getReminderCardTone(urgency: ReminderUrgency): string {
   switch (urgency) {
     case "overdue":
     case "near":
-      return "bg-red-50/60 dark:bg-red-950/30"
+      return "bg-red-100 dark:bg-red-950/30"
     case "soon":
-      return "bg-yellow-50/60 dark:bg-yellow-950/20"
+      return "bg-yellow-100 dark:bg-yellow-950/20"
     case "far":
-      return "bg-emerald-50/50 dark:bg-emerald-950/20"
+      return "bg-emerald-100 dark:bg-emerald-950/20"
     default:
       return ""
   }
@@ -179,11 +179,11 @@ function getReminderTableRowTone(urgency: ReminderUrgency): string {
   switch (urgency) {
     case "overdue":
     case "near":
-      return "[&>td]:bg-red-50/40 dark:[&>td]:bg-red-950/15"
+      return "[&>td]:bg-red-100/80 dark:[&>td]:bg-red-950/15"
     case "soon":
-      return "[&>td]:bg-yellow-50/40 dark:[&>td]:bg-yellow-950/10"
+      return "[&>td]:bg-yellow-100/80 dark:[&>td]:bg-yellow-950/10"
     case "far":
-      return "[&>td]:bg-emerald-50/30 dark:[&>td]:bg-emerald-950/10"
+      return "[&>td]:bg-emerald-100/80 dark:[&>td]:bg-emerald-950/10"
     default:
       return ""
   }
