@@ -597,8 +597,8 @@ export default function Dashboard() {
                               </div>
                             ) : (
                               <Table>
-                                <TableHeader>
-                                  <TableRow>
+                                <TableHeader className="bg-muted/60">
+                                  <TableRow className="hover:bg-muted/60">
                                     <TableHead className="min-w-[40rem]">Role</TableHead>
                                     <TableHead className="w-[120px] text-center">Status</TableHead>
                                     <TableHead className="w-[150px] text-center">Match score</TableHead>
@@ -755,7 +755,7 @@ export default function Dashboard() {
                                     <div key={application.id}>
                                       <div
                                         className={cn(
-                                          "flex flex-col gap-2 rounded-lg border bg-card/50 p-4 transition-colors hover:bg-accent/50",
+                                          "flex flex-col gap-2 rounded-lg border bg-card p-4 transition-colors hover:bg-accent/50",
                                           isSelected && "border-primary/40 bg-muted",
                                         )}
                                         onClick={(event) => {
