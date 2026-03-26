@@ -2,9 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { format, formatDistanceToNow } from "date-fns"
-import { ArrowDownAZ, ArrowUpAZ, MoreHorizontal, Search, RotateCcw } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal, RotateCcw } from "lucide-react"
 import { Header } from "@/components/header"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,17 +23,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar } from "@/components/ui/calendar"
 import { useToast } from "@/components/ui/use-toast"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { apiFetch } from "@/lib/fetcher"
 import { TruncatedText } from "@/components/ui/truncate"
 
@@ -61,21 +52,42 @@ type ReminderDialogState = {
   isEnabling: boolean
 }
 
-type SortValue = "status" | "next" | "applied" | "company"
+type SortValue = "company" | "applied" | "next" | "last" | "status"
 type SortDirection = "asc" | "desc"
 
-const sortOptions: { label: string; value: SortValue }[] = [
-  { label: "Status (due first)", value: "status" },
-  { label: "Next reminder", value: "next" },
-  { label: "Applied date", value: "applied" },
-  { label: "Company name", value: "company" },
-]
-
 const sortDirectionDefaults: Record<SortValue, SortDirection> = {
-  status: "asc",
-  next: "asc",
-  applied: "desc",
   company: "asc",
+  applied: "desc",
+  next: "asc",
+  last: "desc",
+  status: "asc",
+}
+
+function SortHeader({
+  label,
+  active,
+  direction,
+  onClick,
+}: {
+  label: string
+  active: boolean
+  direction: SortDirection
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mx-auto inline-flex items-center justify-center gap-1 font-medium text-foreground transition-colors hover:text-primary"
+    >
+      <span>{label}</span>
+      {active ? (
+        direction === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+      ) : (
+        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+      )}
+    </button>
+  )
 }
 
 function computeNextReminder(followUp: ApplicationFollowUp | undefined): Date | null {
@@ -106,9 +118,8 @@ export default function FollowUpsPage() {
   const { followUps, isLoading: isLoadingFollowUps, mutate: mutateFollowUps } = useApplicationFollowUps()
   const [pending, setPending] = useState<Record<string, boolean>>({})
   const [reminderDialog, setReminderDialog] = useState<ReminderDialogState | null>(null)
-  const [sortBy, setSortBy] = useState<SortValue>("status")
-  const [sortDirection, setSortDirection] = useState<SortDirection>(sortDirectionDefaults.status)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState<SortValue>("next")
+  const [sortDirection, setSortDirection] = useState<SortDirection>(sortDirectionDefaults.next)
 
   const handleDraftUpdated = useCallback(
     (applicationId: string, update: { draft: string; generatedAt?: string | null }) => {
@@ -201,6 +212,12 @@ export default function FollowUpsPage() {
           const right = getDateOrNull(b.application.application_date)?.getTime() ?? 0
           return directionMultiplier * (left - right)
         })
+      case "last":
+        return items.sort((a, b) => {
+          const left = a.lastSent?.getTime() ?? 0
+          const right = b.lastSent?.getTime() ?? 0
+          return directionMultiplier * (left - right)
+        })
       case "company":
         return items.sort((a, b) => {
           const left = a.application.company_name ?? ""
@@ -211,18 +228,6 @@ export default function FollowUpsPage() {
         return items
     }
   }, [rows, sortBy, sortDirection])
-
-  const filteredRows = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase()
-    if (!query) {
-      return sortedRows
-    }
-
-    return sortedRows.filter((row) => {
-      const values = [row.application.company_name, row.application.position_title]
-      return values.some((value) => value?.toLowerCase().includes(query))
-    })
-  }, [searchQuery, sortedRows])
 
   const isLoading = isLoadingApplications || isLoadingFollowUps
 
@@ -284,76 +289,23 @@ export default function FollowUpsPage() {
     setReminderDialog(null)
   }, [reminderDialog, updateFollowUp])
 
+  const onSortChange = useCallback((value: SortValue) => {
+    if (sortBy === value) {
+      setSortDirection((previous) => (previous === "asc" ? "desc" : "asc"))
+      return
+    }
+
+    setSortBy(value)
+    setSortDirection(sortDirectionDefaults[value])
+  }, [sortBy])
+
   return (
     <div className="adaptive-scroll-layout flex h-screen flex-col bg-background overflow-hidden">
       <Header />
       <main className="flex-1 overflow-hidden px-6 pb-4 pt-24">
-        <div className="adaptive-scroll-content mx-auto flex h-full max-w-7xl flex-col space-y-8 overflow-hidden">
+        <div className="adaptive-scroll-content flex h-full w-full flex-col space-y-8 overflow-hidden">
           <section className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <CardHeader className="gap-3">
-              
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <div className="relative w-full md:max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      value={searchQuery}
-                      onChange={(event) => setSearchQuery(event.target.value)}
-                      placeholder="Search by company or role..."
-                      className="w-full pl-9"
-                    />
-                  </div>
-                  <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-center md:gap-3">
-                    <ToggleGroup
-                      type="single"
-                      value={sortDirection}
-                      onValueChange={(value) => {
-                        if (value === "asc" || value === "desc") {
-                          setSortDirection(value)
-                        }
-                      }}
-                      variant="outline"
-                      className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap md:w-auto"
-                    >
-                      <ToggleGroupItem
-                        value="asc"
-                        className="min-w-0 flex-1 items-center gap-1 px-2 sm:px-3 md:flex-none"
-                        aria-label="Sort ascending"
-                      >
-                        <ArrowUpAZ className="h-4 w-4 shrink-0" />
-                        <span className="truncate text-xs sm:text-sm">Ascending</span>
-                      </ToggleGroupItem>
-                      <ToggleGroupItem
-                        value="desc"
-                        className="min-w-0 flex-1 items-center gap-1 px-2 sm:px-3 md:flex-none"
-                        aria-label="Sort descending"
-                      >
-                        <ArrowDownAZ className="h-4 w-4 shrink-0" />
-                        <span className="truncate text-xs sm:text-sm">Descending</span>
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                    <Select
-                      value={sortBy}
-                      onValueChange={(value) => {
-                        const sortValue = value as SortValue
-                        setSortBy(sortValue)
-                        setSortDirection(sortDirectionDefaults[sortValue])
-                      }}
-                    >
-                      <SelectTrigger className="w-full md:w-[200px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sortOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardHeader>
               <CardContent className="flex min-h-0 flex-1 flex-col space-y-4 overflow-hidden">
                 {isLoading ? (
                   <div className="space-y-3">
@@ -368,13 +320,11 @@ export default function FollowUpsPage() {
                   <p className="text-sm text-muted-foreground">
                     Add job applications to start planning your follow-up cadence.
                   </p>
-                ) : filteredRows.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No follow-ups match your search.</p>
                 ) : (
                   <div className="flex min-h-0 flex-1 flex-col space-y-4 overflow-hidden">
                     <ScrollArea className="flex-1">
                       <div className="space-y-4 md:hidden">
-                        {filteredRows.map((row) => {
+                        {sortedRows.map((row) => {
                           const isPending = pending[row.application.id]
                           const appliedDate = getDateOrNull(row.application.application_date)
                           const appliedLabel = appliedDate ? format(appliedDate, "MMM d, yyyy") : "Date unavailable"
@@ -450,21 +400,66 @@ export default function FollowUpsPage() {
                         })}
                       </div>
 
-                      <div className="relative hidden md:block">
-                        <div className="overflow-x-auto rounded-md border px-3 pb-2 md:px-4 lg:px-6">
-                          <Table className="table-auto min-w-[760px]">
-                            <TableHeader>
+                      <div className="relative hidden min-h-0 md:block md:flex-1">
+                        <div className="h-full overflow-x-auto rounded-md border">
+                          <Table className="w-full table-fixed">
+                            <colgroup>
+                              <col className="w-1/6" />
+                              <col className="w-1/6" />
+                              <col className="w-1/6" />
+                              <col className="w-1/6" />
+                              <col className="w-1/6" />
+                              <col className="w-1/6" />
+                            </colgroup>
+                            <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90">
                               <TableRow>
-                                <TableHead className="min-w-[170px] py-4 md:min-w-[220px]">Application</TableHead>
-                                <TableHead className="py-4">Applied</TableHead>
-                                <TableHead className="py-4">Next reminder</TableHead>
-                                <TableHead className="py-4">Last reminder</TableHead>
-                                <TableHead className="py-4">Status</TableHead>
-                                <TableHead className="py-4 min-w-[170px] md:min-w-[220px] text-left">Actions</TableHead>
+                                <TableHead className="sticky top-0 z-20 bg-background px-4 py-4 text-center">
+                                  <SortHeader
+                                    label="Application"
+                                    active={sortBy === "company"}
+                                    direction={sortDirection}
+                                    onClick={() => onSortChange("company")}
+                                  />
+                                </TableHead>
+                                <TableHead className="sticky top-0 z-20 bg-background px-4 py-4 text-center">
+                                  <SortHeader
+                                    label="Applied"
+                                    active={sortBy === "applied"}
+                                    direction={sortDirection}
+                                    onClick={() => onSortChange("applied")}
+                                  />
+                                </TableHead>
+                                <TableHead className="sticky top-0 z-20 bg-background px-4 py-4 text-center">
+                                  <SortHeader
+                                    label="Next reminder"
+                                    active={sortBy === "next"}
+                                    direction={sortDirection}
+                                    onClick={() => onSortChange("next")}
+                                  />
+                                </TableHead>
+                                <TableHead className="sticky top-0 z-20 bg-background px-4 py-4 text-center">
+                                  <SortHeader
+                                    label="Last reminder"
+                                    active={sortBy === "last"}
+                                    direction={sortDirection}
+                                    onClick={() => onSortChange("last")}
+                                  />
+                                </TableHead>
+                                <TableHead className="sticky top-0 z-20 bg-background px-4 py-4 text-center">
+                                  <SortHeader
+                                    label="Status"
+                                    active={sortBy === "status"}
+                                    direction={sortDirection}
+                                    onClick={() => onSortChange("status")}
+                                  />
+                                </TableHead>
+                                <TableHead className="sticky top-0 z-20 bg-background px-4 py-4 text-center">
+                                  Actions
+                                </TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {filteredRows.map((row) => {
+                              {sortedRows.map((row) => {
                                 const isPending = pending[row.application.id]
                                 const appliedDate = getDateOrNull(row.application.application_date)
                                 const appliedLabel = appliedDate ? format(appliedDate, "MMM d, yyyy") : "Date unavailable"
@@ -480,24 +475,24 @@ export default function FollowUpsPage() {
                                     key={row.application.id}
                                     className={`align-top [&>td]:py-5 transition-colors `}
                                   >
-                                    <TableCell className="max-w-[280px]">
-                                      <div className="space-y-1">
+                                    <TableCell className="px-4 text-center">
+                                      <div className="flex flex-col items-center space-y-1">
                                         <TruncatedText
                                           text={row.application.company_name ?? ""}
                                           className="font-medium leading-tight"
-                                          maxWidthClass="max-w-[13rem] lg:max-w-[15rem]"
+                                          maxWidthClass="max-w-[10rem] xl:max-w-[12rem]"
                                         />
                                         <TruncatedText
                                           text={row.application.position_title ?? ""}
                                           className="text-sm text-muted-foreground leading-tight"
-                                          maxWidthClass="max-w-[13rem] lg:max-w-[15rem]"
+                                          maxWidthClass="max-w-[10rem] xl:max-w-[12rem]"
                                         />
                                       </div>
                                     </TableCell>
-                                    <TableCell className="text-sm">{appliedLabel}</TableCell>
-                                    <TableCell className="text-sm">{nextReminderLabel}</TableCell>
-                                    <TableCell className="text-sm">{lastReminderLabel}</TableCell>
-                                    <TableCell>
+                                    <TableCell className="px-4 text-center text-sm">{appliedLabel}</TableCell>
+                                    <TableCell className="px-4 text-center text-sm">{nextReminderLabel}</TableCell>
+                                    <TableCell className="px-4 text-center text-sm">{lastReminderLabel}</TableCell>
+                                    <TableCell className="px-4 text-center">
                                       <Badge variant="outline" className={getStatusBadgeTone(row.status)}>
                                         {row.status === "due"
                                           ? "Follow-up due"
@@ -506,8 +501,8 @@ export default function FollowUpsPage() {
                                             : "Not scheduled"}
                                       </Badge>
                                     </TableCell>
-                                    <TableCell className="align-top [&>td]:py-5 transition-colors">
-                                      <div className="flex flex-col items-start gap-2 lg:flex-row lg:flex-wrap lg:justify-start">
+                                    <TableCell className="px-4 align-top">
+                                      <div className="flex flex-row items-center justify-center gap-2">
                                         <FollowUpDraftDialog
                                           application={row.application}
                                           disabled={(!row.enabled && !row.lastSent) || isPending}
@@ -516,14 +511,14 @@ export default function FollowUpsPage() {
                                               row.application.ai_follow_up_draft_text,
                                           )}
                                           onDraftUpdated={(update) => handleDraftUpdated(row.application.id, update)}
-                                          triggerClassName="w-full lg:w-[11rem]"
+                                          triggerClassName="w-auto"
                                         />
                                         <Button
                                           size="sm"
                                           variant="outline"
                                           onClick={() => openReminderDialog(row, { isEnabling: !row.enabled })}
                                           disabled={isPending}
-                                          className="w-full lg:w-[11rem]"
+                                          className="w-auto"
                                         >
                                           Set reminder
                                         </Button>
